@@ -6,9 +6,9 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/',
-    name: 'Link',
+    name: 'Index',
     meta: { title: '' },
-    component: () => import('@/views/link/index.vue')
+    component: () => import('@/views/index/index.vue')
   },
   {
     path: '/401',
