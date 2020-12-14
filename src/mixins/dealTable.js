@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-import { getLastSevenDay, getLastThirtyDay, prevWeek } from '../common/utils/timeCalc'
+import { getLastSevenDay, getLastThirtyDay, prevWeek, prevYear, recentYear, monthSpliceDay } from '../common/utils/timeCalc'
 const mixins = {
   data () {
     return {
@@ -29,21 +29,29 @@ const mixins = {
       switch (timeType) {
         // 最近7天
         case 1:
+          this.timeSection = getLastSevenDay()
           break
         // 上周
         case 2:
-          prevWeek()
+          this.timeSection = prevWeek()
           break
         // 最近三十天
         case 4:
+          this.timeSection = getLastThirtyDay()
           break
         // 最近一年
         case 5:
+          this.timeSection = recentYear()
           break
         // 去年
         case 6:
+          this.timeSection = prevYear()
           break
       }
+    },
+    // 格式化月份时间
+    fromatMonth () {
+      monthSpliceDay(this.searchForm.month)
     },
     resetForm (formName) {
       this.$refs[formName].resetFields()

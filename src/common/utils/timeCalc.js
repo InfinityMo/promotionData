@@ -1,59 +1,99 @@
+// Tip:所有结束时间均为当前时间前一天
 import { dateFormat } from './funcStore'
 // 最近30天
 export function getLastThirtyDay () {
-  var now = new Date()
-  var year = now.getFullYear()
-  var month = now.getMonth() + 1// 0-11表示1-12月
-  var day = now.getDate()
-  var dateObj = {}
-  dateObj.now = year + '-' + month + '-' + day
-  var nowMonthDay = new Date(year, month, 0).getDate() // 当前月的总天数
-  if (month - 1 <= 0) { // 如果是1月，年数往前推一年<br>
-    dateObj.last = (year - 1) + '-' + 12 + '-' + day
+  var nowDate = new Date()
+  var prevOneDate = `${nowDate.getFullYear()}-${nowDate.getMonth() + 1}-${nowDate.getDate() - 1}`
+  var DateIn = new Date((new Date().getTime() - 1000 * 60 * 60 * 24 * 30))
+  var Year = 0
+  var Month = 0
+  var Day = 0
+  var prevDate = ''
+  // 初始化时间
+  Year = DateIn.getYear()
+  Month = DateIn.getMonth() + 1
+  Day = DateIn.getDate()
+  Year = (Year < 1900 ? (1900 + Year) : Year)
+  prevDate = Year + '-'
+  if (Month >= 10) {
+    prevDate = prevDate + Month + '-'
   } else {
-    var lastMonthDay = new Date(year, (parseInt(month) - 1), 0).getDate()
-    if (lastMonthDay < day) { // 1个月前所在月的总天数小于现在的天日期
-      if (day < nowMonthDay) { // 当前天日期小于当前月总天数
-        dateObj.last = year + '-' + (month - 1) + '-' + (lastMonthDay - (nowMonthDay - day))
-      } else {
-        dateObj.last = year + '-' + (month - 1) + '-' + lastMonthDay
-      }
-    } else {
-      dateObj.last = year + '-' + (month - 1) + '-' + day
-    }
+    prevDate = prevDate + '0' + Month + '-'
   }
-  return dateObj
+  if (Day >= 10) {
+    prevDate = prevDate + Day
+  } else {
+    prevDate = prevDate + '0' + Day
+  }
+  return [prevDate, prevOneDate]
 }
 
 // 最近7天
 export function getLastSevenDay () {
-  var now = new Date()
+  var curDate = new Date()
+  var now = new Date(curDate.getTime() - 24 * 60 * 60 * 1000)
   var year = now.getFullYear()
-  var month = now.getMonth() + 1// 0-11表示1-12月
+  var month = now.getMonth() + 1
   var day = now.getDate()
   var dateObj = {}
   dateObj.now = year + '-' + month + '-' + day
   if (day - 7 <= 0) { // 如果在当月7日之前
     var lastMonthDay = new Date(year, (parseInt(month) - 1), 0).getDate() // 1周前所在月的总天数
     if (month - 1 <= 0) { // 如果在当年的1月份
-      dateObj.last = (year - 1) + '-' + 12 + '-' + (31 - (7 - day))
+      dateObj.last = (year - 1) + '-' + 12 + '-' + (31 - (6 - day))
     } else {
-      dateObj.last = year + '-' + (month - 1) + '-' + (lastMonthDay - (7 - day))
+      dateObj.last = year + '-' + (month - 1) + '-' + (lastMonthDay - (6 - day))
     }
   } else {
-    dateObj.last = year + '-' + month + '-' + (day - 7)
+    dateObj.last = year + '-' + month + '-' + (day - 6)
   }
-  return dateObj
+  return [dateObj.last, dateObj.now]
+}
+// 最近一年
+export function recentYear () {
+  var tempYear = new Date()
+  var recentSetYear = new Date(tempYear.setFullYear(tempYear.getFullYear() - 1))
+  var recentYear = `${recentSetYear.getFullYear()}-${recentSetYear.getMonth() + 1}-${recentSetYear.getDate() - 1}`
+  var nowDate = new Date()
+  var prevOneDate = `${nowDate.getFullYear()}-${nowDate.getMonth() + 1}-${nowDate.getDate() - 1}`
+  return [recentYear, prevOneDate]
 }
 // 上周
 export function prevWeek () {
   var now = new Date()
-  var nowYear = now.getYear()
-  var nowMonth = now.getMonth()
-  var nowDay = now.getDate()
-  var nowDayOfWeek = now.getDay()
-  var weekStartDate = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek - 7)
-  var weekEndDate = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek - 1)
-  console.log(dateFormat('YYYY-mm-dd', weekStartDate))
-  console.log(dateFormat('YYYY-mm-dd', weekEndDate))
+  var weekDate = new Date(now.getTime() - 7 * 24 * 3600 * 1000)
+  var weekDate2 = new Date(now.getTime() - 7 * 24 * 3600 * 1000)
+  var day = weekDate.getDay()
+  var time = weekDate.getDate() - day + (day === 0 ? -6 : 1)
+  var startDate = new Date(weekDate.setDate(time))
+  var endDate = new Date(weekDate2.setDate(time + 6))
+  return [dateFormat('YYYY-mm-dd', startDate), dateFormat('YYYY-mm-dd', endDate)]
+}
+// 去年
+export function prevYear () {
+  var now = new Date()
+  var lastYear = now.getFullYear() - 1
+  return [`${lastYear}-01-01`, `${lastYear}-12-31`]
+}
+
+// 根据当前月份拼接完成日期
+export function monthSpliceDay (monthYear) {
+  // 当前月份
+  var currentDate = new Date()
+  var nowMonth = currentDate.getMonth() + 1 > 10 ? currentDate.getMonth() + 1 : `0${currentDate.getMonth() + 1}`
+  // 当前日期的前一天
+  var prevOneDate = new Date().getDate() - 1
+  // 指定日期
+  var pointDate = new Date(monthYear)
+  var pointYear = pointDate.getFullYear()
+  var pointMonth = pointDate.getMonth() + 1 > 10 ? pointDate.getMonth() + 1 : `0${pointDate.getMonth() + 1}`
+  // 指定月份的最后一天
+  var pointMonthLastDay = new Date(pointYear, pointMonth, 0).getDate()
+  if (nowMonth === pointMonth) {
+    console.log([`${pointYear}-${pointMonth}-01`, `${pointYear}-${pointMonth}-${prevOneDate}`])
+    return [`${pointYear}-${pointMonth}-01`, `${pointYear}-${pointMonth}-${prevOneDate}`]
+  } else {
+    console.log([`${pointYear}-${pointMonth}-01`, `${pointYear}-${pointMonth}-${pointMonthLastDay}`])
+    return [`${pointYear}-${pointMonth}-01`, `${pointYear}-${pointMonth}-${pointMonthLastDay}`]
+  }
 }

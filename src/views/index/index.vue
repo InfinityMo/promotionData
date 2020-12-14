@@ -13,7 +13,7 @@
                 <el-select placeholder="请选择时间类型"
                            @change="timeTypeChange"
                            v-model="searchForm.timeType">
-                  <el-option v-for="item in timeType"
+                  <el-option v-for="item in timeTypeArr"
                              :key="item.value"
                              :label="item.label"
                              :value="item.value">
@@ -25,7 +25,6 @@
               <el-form-item label="精确月份："
                             v-show="searchForm.timeType===3">
                 <el-date-picker v-model="searchForm.month"
-                                :popper-append-to-body="false"
                                 value-format="yyyy-MM"
                                 format="yyyy-MM"
                                 type="month"
@@ -34,7 +33,7 @@
               </el-form-item>
               <el-form-item label="日期区间："
                             v-show="searchForm.timeType!==3">
-                <el-date-picker v-model="searchForm.timeSection"
+                <el-date-picker v-model="timeSection"
                                 :disabled="timeDisabled"
                                 value-format="yyyy-MM-dd"
                                 format="yyyy-MM-dd"
@@ -74,7 +73,8 @@
             <el-col :span="16">
               <el-form-item class="search-btn">
                 <el-button>重置</el-button>
-                <el-button type="primary">查询</el-button>
+                <el-button type="primary"
+                           @click="searchHandle">查询</el-button>
               </el-form-item>
             </el-col>
           </el-row>
@@ -97,7 +97,7 @@
 <script>
 import tableMixin from '@/mixins/dealTable'
 import HeaderTop from '@/components/header'
-import { timeType, shopArr, extendOptions } from './data'
+import { timeTypeArr, shopArr, extendOptions } from './data'
 
 export default {
   mixins: [tableMixin],
@@ -106,24 +106,32 @@ export default {
     return {
       searchForm: {
         timeType: '',
-        timeSection: '',
-        month: '',
+        month: '', // 日期
         shop: '',
         extend: ''
       },
-      timeType: timeType,
+      timeSection: [], // 时间范围
+      timeTypeArr: timeTypeArr,
       shopArr: shopArr,
       extendOptions: extendOptions
     }
   },
+  watch: {
 
+  },
   async created () {
 
   },
   mounted () {
 
   },
-  methods: {}
+  methods: {
+    searchHandle () {
+      if (this.searchForm.month) {
+        this.fromatMonth()
+      }
+    }
+  }
 }
 </script>
 <style lang="less" scoped>
