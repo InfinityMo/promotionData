@@ -5,12 +5,14 @@
       <div class="search-wrap">
         <el-form :model="searchForm"
                  id="form"
-                 label-width="70px"
-                 ref="searchForm">
+                 ref="searchForm"
+                 label-width="70px">
           <el-row class="row ">
             <el-col :span="8">
-              <el-form-item label="时间类型：">
+              <el-form-item label="时间类型："
+                            prop="timeType">
                 <el-select placeholder="请选择时间类型"
+                           popper-class="reset-select"
                            @change="timeTypeChange"
                            v-model="searchForm.timeType">
                   <el-option v-for="item in timeTypeArr"
@@ -23,6 +25,7 @@
             </el-col>
             <el-col :span="8">
               <el-form-item label="精确月份："
+                            prop="month"
                             v-show="searchForm.timeType===3">
                 <el-date-picker v-model="searchForm.month"
                                 value-format="yyyy-MM"
@@ -41,14 +44,15 @@
                                 align="right"
                                 unlink-panels
                                 range-separator="~"
-                                :picker-options="disabledTime"
+                                :picker-options="pickerOptions"
                                 start-placeholder="开始日期"
                                 end-placeholder="结束日期">
                 </el-date-picker>
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item label="店铺选择：">
+              <el-form-item label="店铺选择："
+                            prop="shop">
                 <el-select placeholder="请选择店铺"
                            v-model="searchForm.shop">
                   <el-option v-for="item in shopArr"
@@ -62,8 +66,10 @@
           </el-row>
           <el-row class="row ">
             <el-col :span="8">
-              <el-form-item label="推广工具：">
-                <el-cascader :options="extendOptions"
+              <el-form-item label="推广工具："
+                            prop="extend">
+                <el-cascader v-model="searchForm.extend"
+                             :options="extendOptions"
                              :props="{ multiple: true }"
                              collapse-tags
                              clearable>
@@ -72,7 +78,7 @@
             </el-col>
             <el-col :span="16">
               <el-form-item class="search-btn">
-                <el-button>重置</el-button>
+                <el-button @click="resetForm('searchForm')">重置</el-button>
                 <el-button type="primary"
                            @click="searchHandle">查询</el-button>
               </el-form-item>
@@ -84,11 +90,7 @@
            ref="table">
         <div class="flex-between-center table-info">
           <h4>列表</h4>
-          <!-- <el-button type="primary"
-                     class="flex-center add-btn">
-            <i class="add-icon"></i>
-            <label>新增商品</label>
-          </el-button> -->
+
         </div>
       </div>
     </div>

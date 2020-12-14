@@ -1,10 +1,25 @@
-// eslint-disable-next-line no-unused-vars
 import { getLastSevenDay, getLastThirtyDay, prevWeek, prevYear, recentYear, monthSpliceDay } from '../common/utils/timeCalc'
 const mixins = {
   data () {
     return {
-      disabledTime: {
+      pickerOptions: {
+        onPick: ({ maxDate, minDate }) => {
+          this.pickerMinDate = minDate.getTime()
+          if (maxDate) {
+            this.pickerMinDate = ''
+          }
+        },
         disabledDate: (time) => {
+          // 时间最大选择区间为30天，且当前时间不可选择
+          if (this.pickerMinDate) {
+            const thirtyDay = (30 - 1) * 24 * 3600 * 1000
+            let maxTime = this.pickerMinDate + thirtyDay
+            const minTime = this.pickerMinDate - thirtyDay
+            if (maxTime > new Date()) {
+              maxTime = new Date()
+            }
+            return time.getTime() > maxTime || time.getTime() < minTime
+          }
           return time.getTime() > Date.now() - 1 * 24 * 3600 * 1000
         }
       }
@@ -18,14 +33,13 @@ const mixins = {
     }
   },
   watch: {
-    'searchForm.timeType' (oldValue, newVal) {
-      this.searchForm.timeSection = ''
-      this.searchForm.month = ''
-    }
+
   },
   methods: {
     // 处理时间
     timeTypeChange (timeType) {
+      this.timeSection = []
+      this.searchForm.month = ''
       switch (timeType) {
         // 最近7天
         case 1:
@@ -54,6 +68,7 @@ const mixins = {
       monthSpliceDay(this.searchForm.month)
     },
     resetForm (formName) {
+      this.timeSection = []
       this.$refs[formName].resetFields()
     }
   }
