@@ -16,25 +16,28 @@
           111
         </template>
       </el-table-column> -->
-      <el-table-column v-for="(cloumn ,index) in columns"
-                       :fixed="cloumn.isFixed"
-                       :width="cloumn.width"
-                       :align="cloumn.align"
-                       :key="cloumn.key"
-                       :prop="cloumn.key"
-                       :label="cloumn.value">
-        <template slot="header"
-                  v-if="cloumn.edit">
-          <div class="reset-header flex-item-center flex-between">
-            <i class="edit-success-icon"
-               v-if="cloumn.isEdit"></i>
-            <i class="edit-icon"
-               @click="toEdit(index)"
-               v-else></i>
-            <span>{{cloumn.value}}</span>
-          </div>
-        </template>
-      </el-table-column>
+      <div :key="randomKey">
+        <el-table-column v-for="(cloumn ,index) in columns"
+                         :fixed="cloumn.isFixed"
+                         :width="cloumn.width"
+                         :align="cloumn.align"
+                         :key="cloumn.key"
+                         :prop="cloumn.key"
+                         :label="cloumn.value">
+          <template slot="header"
+                    v-if="cloumn.edit">
+            <div class="reset-header flex-item-center flex-between">
+              <i class="edit-success-icon"
+                 v-if="cloumn.isEdit"></i>
+              <i class="edit-icon"
+                 @click="toEdit(index)"
+                 v-else></i>
+              <span>{{cloumn.value}}</span>
+            </div>
+          </template>
+        </el-table-column>
+      </div>
+
     </el-table>
   </div>
 </template>
@@ -44,6 +47,7 @@ import { tableData } from './tableData'
 export default {
   data () {
     return {
+      randomKey: '1',
       columns: [],
       tableData: tableData
     }
@@ -83,12 +87,13 @@ export default {
     },
     toEdit (index) {
       // console.log(this.columns[index])
-
-      const target = JSON.parse(JSON.stringify(this.columns[index]))
-      target.isEdit = true
-
+      // this.randomKey = Math.random() * 100000000
+      // const target = JSON.parse(JSON.stringify(this.columns[index]))
+      // target.isEdit = true
+      // this.columns.splice(index, 1)
+      // this.columns.push(target)
       // this.$set(this.columns, index, target)
-      // this.columns[index].isEdit = true
+      this.columns[index].isEdit = true
       // console.log(this.columns)
     }
   }
