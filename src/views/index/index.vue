@@ -24,44 +24,49 @@
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item label="精确月份："
-                            prop="month"
-                            v-show="searchForm.timeType===3">
-                <el-date-picker v-model="searchForm.month"
-                                value-format="yyyy-MM"
-                                format="yyyy-MM"
-                                type="month"
-                                placeholder="请选择选择月份">
-                </el-date-picker>
-              </el-form-item>
-              <el-form-item label="日期区间："
-                            v-show="searchForm.timeType!==3">
-                <el-date-picker v-model="timeSection"
-                                :disabled="timeDisabled"
-                                value-format="yyyy-MM-dd"
-                                format="yyyy-MM-dd"
-                                type="daterange"
-                                align="right"
-                                unlink-panels
-                                range-separator="~"
-                                :picker-options="pickerOptions"
-                                start-placeholder="开始日期"
-                                end-placeholder="结束日期">
-                </el-date-picker>
-              </el-form-item>
+              <div class="flex-center">
+                <el-form-item label="精确月份："
+                              prop="month"
+                              v-show="searchForm.timeType===3">
+                  <el-date-picker v-model="searchForm.month"
+                                  value-format="yyyy-MM"
+                                  format="yyyy-MM"
+                                  type="month"
+                                  placeholder="请选择选择月份">
+                  </el-date-picker>
+                </el-form-item>
+                <el-form-item label="日期区间："
+                              class="time-range"
+                              v-show="searchForm.timeType!==3">
+                  <el-date-picker v-model="timeSection"
+                                  :disabled="timeDisabled"
+                                  value-format="yyyy-MM-dd"
+                                  format="yyyy-MM-dd"
+                                  type="daterange"
+                                  align="right"
+                                  unlink-panels
+                                  range-separator="~"
+                                  :picker-options="pickerOptions"
+                                  start-placeholder="开始日期"
+                                  end-placeholder="结束日期">
+                  </el-date-picker>
+                </el-form-item>
+              </div>
             </el-col>
             <el-col :span="8">
-              <el-form-item label="店铺选择："
-                            prop="shop">
-                <el-select placeholder="请选择店铺"
-                           v-model="searchForm.shop">
-                  <el-option v-for="item in shopArr"
-                             :key="item.value"
-                             :label="item.label"
-                             :value="item.value">
-                  </el-option>
-                </el-select>
-              </el-form-item>
+              <div class="flex-end">
+                <el-form-item label="店铺选择："
+                              prop="shop">
+                  <el-select placeholder="请选择店铺"
+                             v-model="searchForm.shop">
+                    <el-option v-for="item in shopArr"
+                               :key="item.value"
+                               :label="item.label"
+                               :value="item.value">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </div>
             </el-col>
           </el-row>
           <el-row class="row ">
@@ -89,9 +94,32 @@
       <div class="table-wrap"
            ref="table">
         <div class="flex-between-center table-info">
-          <h4>列表</h4>
-
+          <div class="flex-item-center">
+            <!-- 表格标题 -->
+            <h4>列表</h4>
+            <p class="select-tip"
+               v-show="timeTypeSelect!==''||shopSelect!==''">（<span>{{timeTypeSelect}}</span><em v-show="timeTypeSelect!==''&&shopSelect!==''">，</em><span>{{shopSelect}}</span>）</p>
+          </div>
+          <!-- 右侧功能 -->
+          <div class="btn-gather">
+            <el-link type="primary"
+                     class="down-btn"
+                     :underline="false">
+              <el-tooltip class="item"
+                          effect="dark"
+                          content="请使用表格模板导入数据"
+                          placement="top">
+                <i class="el-icon-question"></i>
+              </el-tooltip>
+              <span>下载表格模板</span>
+            </el-link>
+            <el-button plain
+                       class="import-btn"><i class="import-icon"></i>导入数据</el-button>
+            <el-button type="primary"><i class="export-icon"></i>下载报表</el-button>
+          </div>
         </div>
+        <!-- table -->
+        <Table />
       </div>
     </div>
   </div>
@@ -100,10 +128,10 @@
 import tableMixin from '@/mixins/dealTable'
 import HeaderTop from '@/components/header'
 import { timeTypeArr, shopArr, extendOptions } from './data'
-
+import Table from './table'
 export default {
   mixins: [tableMixin],
-  components: { HeaderTop },
+  components: { HeaderTop, Table },
   data () {
     return {
       searchForm: {

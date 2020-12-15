@@ -30,6 +30,22 @@ const mixins = {
       let flag = true
       this.searchForm.timeType === 0 ? flag = false : flag = true
       return flag
+    },
+    timeTypeSelect () {
+      if (this.searchForm.timeType === 0 || this.searchForm.timeType === 3) {
+        if (this.searchForm.timeType === 0) {
+          return this.timeSection.length > 0 ? `${this.timeSection[0]}~${this.timeSection[1]}` : ''
+        } else {
+          return this.searchForm.month
+        }
+      } else {
+        const target = this.timeTypeArr.filter(i => i.value === this.searchForm.timeType)
+        return target.length > 0 ? target[0].label : ''
+      }
+    },
+    shopSelect () {
+      const target = this.shopArr.filter(i => i.value === this.searchForm.shop)
+      return target.length > 0 ? target[0].label : ''
     }
   },
   watch: {
