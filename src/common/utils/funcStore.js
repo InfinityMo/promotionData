@@ -27,6 +27,20 @@ export function backTop () {
     }
   }, 30)
 }
+export function scrollTo (distance) {
+  const timer = setInterval(function () {
+    const top = document.body.scrollTop || document.documentElement.scrollTop
+    const speed = distance / 4
+    if (document.body.scrollTop !== 0) {
+      document.body.scrollTop += speed
+    } else {
+      document.documentElement.scrollTop += speed
+    }
+    if (top >= distance) {
+      clearInterval(timer)
+    }
+  }, 30)
+}
 // 时间格式化
 export function dateFormat (fmt, date) {
   let ret

@@ -2,6 +2,7 @@
   <div>
     <el-form :model="editTable">
       <el-table :data="tableData"
+                class="custom-table"
                 style="width: 100%"
                 :span-method="rowMerge"
                 border
@@ -29,6 +30,7 @@
           <template slot-scope="scope">
             <div v-if="cloumn.edit&&cloumn.isEdit">
               <el-form-item :prop="cloumn.key+scope.$index"
+                            class="table-input"
                             :rules="[{ required: true, message: '请输入', trigger: 'blur' }]">
                 <el-input v-model="editTable[cloumn.key+scope.$index]"></el-input>
               </el-form-item>
