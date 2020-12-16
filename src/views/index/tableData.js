@@ -1,5 +1,6 @@
 export const tableData = [
   {
+    promoID: '123',
     toolType: '淘宝（定向计划）',
     dataType: '店铺总点击（生意参谋）',
     _12Month1day: '300,000,000.00',
@@ -15,6 +16,7 @@ export const tableData = [
     monthCompare: '75.99%'
   },
   {
+    promoID: '123',
     toolType: '淘宝（定向计划）',
     dataType: '付款笔数',
     _12Month1day: '356.00',
@@ -30,6 +32,7 @@ export const tableData = [
     monthCompare: '75.99%'
   },
   {
+    promoID: '123',
     toolType: '淘宝（定向计划）',
     dataType: 'UV价值',
     _12Month1day: '356.00',
@@ -44,6 +47,7 @@ export const tableData = [
     yearCompare: '65.00%',
     monthCompare: '75.99%'
   }, {
+    promoID: '456',
     toolType: '汇总',
     dataType: '店铺总点击（生意参谋）',
     _12Month1day: '356.00',
@@ -59,6 +63,7 @@ export const tableData = [
     monthCompare: '75.99%'
   },
   {
+    promoID: '456',
     toolType: '汇总',
     dataType: '付款笔数',
     _12Month1day: '356.00',
@@ -74,6 +79,7 @@ export const tableData = [
     monthCompare: '75.99%'
   },
   {
+    promoID: '456',
     toolType: '汇总',
     dataType: 'UV价值',
     _12Month1day: '356.00',
@@ -88,6 +94,7 @@ export const tableData = [
     yearCompare: '65.00%',
     monthCompare: '75.99%'
   }, {
+    promoID: '789',
     toolType: '品销宝',
     dataType: '店铺总点击（生意参谋）',
     _12Month1day: '356.00',
@@ -103,7 +110,39 @@ export const tableData = [
     monthCompare: '75.99%'
   },
   {
+    promoID: '789',
     toolType: '品销宝',
+    dataType: '付款笔数',
+    _12Month1day: '356.00',
+    _12Month2day: '200,376.00',
+    _12Month3day: '205,386.00',
+    _12Month4day: '100,326.00',
+    _12Month5day: '300,356.00',
+    _12Month6day: '500,396.00',
+    _12Month7day: '600,356.00',
+    sum: '6,010,680,200.00',
+    stSum: '6,010,680,200.00',
+    yearCompare: '65.00%',
+    monthCompare: '75.99%'
+  },
+  {
+    promoID: '101112',
+    toolType: '品牌特秀',
+    dataType: '店铺总点击（生意参谋）',
+    _12Month1day: '356.00',
+    _12Month2day: '200,376.00',
+    _12Month3day: '205,386.00',
+    _12Month4day: '100,326.00',
+    _12Month5day: '300,356.00',
+    _12Month6day: '500,396.00',
+    _12Month7day: '600,356.00',
+    sum: '6,010,680,200.00',
+    stSum: '6,010,680,200.00',
+    yearCompare: '65.00%',
+    monthCompare: '75.99%'
+  }, {
+    promoID: '101112',
+    toolType: '品牌特秀',
     dataType: '付款笔数',
     _12Month1day: '356.00',
     _12Month2day: '200,376.00',

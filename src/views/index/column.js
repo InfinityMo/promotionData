@@ -2,54 +2,67 @@ export const column = [
   {
     key: 'toolType',
     value: '推广类型',
+    id: '1',
     edit: false
   }, {
     key: 'dataType',
     value: '数据类型',
+    id: '2',
     edit: false
   }, {
     key: '_12Month1day',
     value: '12月1号',
+    id: '3',
     edit: true
   }, {
     key: '_12Month2day',
     value: '12月2号',
+    id: '4',
     edit: true
   }, {
     key: '_12Month3day',
     value: '12月3号',
+    id: '5',
     edit: true
   }, {
     key: '_12Month4day',
     value: '12月4号',
+    id: '6',
     edit: true
   }, {
     key: '_12Month5day',
     value: '12月5号',
+    id: '7',
     edit: true
   }, {
     key: '_12Month6day',
     value: '12月6号',
+    id: '8',
     edit: true
   }, {
     key: '_12Month7day',
     value: '12月7号',
+    id: '9',
     edit: true
   }, {
     key: 'sum',
     value: '求和',
+    id: '10',
     edit: false
   }, {
     key: 'stSum',
     value: '修正求和',
+    id: '11',
     edit: false
   }, {
     key: 'yearCompare',
     value: '同比',
+    id: '12',
     edit: false
   }, {
     key: 'monthCompare',
     value: '环比',
+    id: '13',
     edit: false
   }
 ]

@@ -1,30 +1,20 @@
 <template>
   <div>
-    <el-table :data="tableData"
-              style="width: 100%"
-              border
-              height="250">
-      <!-- <el-table-column fixed
-                       prop="date"
-                       label="日期"
-                       width="150">
-      </el-table-column>
-      <el-table-column prop="province"
-                       label="省份"
-                       width="120">
-        <template slot="header">
-          111
-        </template>
-      </el-table-column> -->
-      <div :key="randomKey">
-        <el-table-column v-for="(cloumn ,index) in columns"
+    <el-form :model="editTable">
+      <el-table :data="tableData"
+                style="width: 100%"
+                :span-method="rowMerge"
+                border
+                height="460">
+        <el-table-column v-for="(cloumn,index) in columns"
                          :fixed="cloumn.isFixed"
                          :width="cloumn.width"
                          :align="cloumn.align"
-                         :key="cloumn.key"
+                         :key="cloumn.randomKey"
                          :prop="cloumn.key"
                          :label="cloumn.value">
-          <template slot="header"
+          <!-- 插槽-自定义表头 -->
+          <template #header
                     v-if="cloumn.edit">
             <div class="reset-header flex-item-center flex-between">
               <i class="edit-success-icon"
@@ -35,10 +25,19 @@
               <span>{{cloumn.value}}</span>
             </div>
           </template>
+          <!-- 插槽-自定义表格 -->
+          <template slot-scope="scope">
+            <div v-if="cloumn.edit&&cloumn.isEdit">
+              <el-form-item :prop="cloumn.key+scope.$index"
+                            :rules="[{ required: true, message: '请输入', trigger: 'blur' }]">
+                <el-input v-model="editTable[cloumn.key+scope.$index]"></el-input>
+              </el-form-item>
+            </div>
+            <div v-else>{{scope.row[cloumn.key]}}</div>
+          </template>
         </el-table-column>
-      </div>
-
-    </el-table>
+      </el-table>
+    </el-form>
   </div>
 </template>
 <script>
@@ -47,20 +46,26 @@ import { tableData } from './tableData'
 export default {
   data () {
     return {
-      randomKey: '1',
       columns: [],
-      tableData: tableData
+      tableData: [],
+      editTable: {},
+      promotIdArr: []
     }
   },
   computed: {
+    randomKey () {
+      return Math.random() * 100000000
+    }
   },
   created () {
     this.getColumns()
+    this.getTableData()
   },
   methods: {
     getColumns () {
       this.columns = column
       this.columns.forEach(i => {
+        i.randomKey = Math.random() * 100000000
         if (i.edit) {
           i.isEdit = false
         }
@@ -83,18 +88,58 @@ export default {
           i.isFixed = false
         }
       })
-      console.log(this.columns)
+    },
+    getTableData () {
+      this.tableData = tableData
+      this.tableData.map(i => {
+        this.promotIdArr.push(i.promoID)
+      })
     },
     toEdit (index) {
-      // console.log(this.columns[index])
-      // this.randomKey = Math.random() * 100000000
-      // const target = JSON.parse(JSON.stringify(this.columns[index]))
-      // target.isEdit = true
-      // this.columns.splice(index, 1)
-      // this.columns.push(target)
-      // this.$set(this.columns, index, target)
-      this.columns[index].isEdit = true
-      // console.log(this.columns)
+      // 每次编辑一行
+      const columnKeyArr = []
+      this.columns.map((item, index) => {
+        if (item.edit) {
+          this.columns[index].isEdit = false
+          columnKeyArr.push(item.key)
+        }
+      })
+      const target = this.columns[index]
+      target.isEdit = true
+      target.randomKey = Math.random() * 100000000
+      this.$set(this.columns, index, target)
+      if (columnKeyArr.length > 0) {
+        const columnKey = target.key
+        this.tableData.map((item, index) => {
+          this.$set(this.editTable, columnKey + index, item[columnKey])
+        })
+      }
+      console.log(this.editTable)
+    },
+    // 合并行
+    rowMerge ({ row, column, rowIndex, columnIndex }) {
+      if (columnIndex === 0) {
+        const fiterArr = this.promotIdArr.filter(i => i === row.promoID)
+        console.log(fiterArr)
+        if (fiterArr.length > 0) {
+          if (rowIndex % fiterArr.length === 0) {
+            return {
+              rowspan: fiterArr.length,
+              colspan: 1
+            }
+          } else {
+            return {
+              rowspan: 0,
+              colspan: 0
+            }
+          }
+        } else {
+          return {
+            rowspan: 0,
+            colspan: 0
+          }
+        }
+      }
     }
   }
 }
