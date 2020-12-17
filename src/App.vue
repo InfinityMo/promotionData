@@ -6,6 +6,7 @@
          element-loading-background="rgba(0, 0, 0, .6)">
       <router-view />
     </div>
+
   </div>
 </template>
 <script>

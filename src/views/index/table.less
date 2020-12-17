@@ -21,15 +21,37 @@
   }
 
   /deep/ td {
-    padding: 11px 0;
+    // padding: 11px 0;
+    padding: 0;
+  }
+
+  .normal-cell {
+    padding: 13px 0;
+  }
+
+  .has-input {
+    padding-top: 5px;
+  }
+
+  .column-stripe {
+    background-color: #F4FBFB;
   }
 }
 
 .table-input {
-  margin-bottom: 0;
+  margin-bottom: 14px;
+
+  /deep/.el-form-item__content {
+    line-height: 24px;
+  }
 
   /deep/.el-input__inner {
-    height: 32px;
-    line-height: 32px;
+    height: 24px;
+    line-height: 24px;
+    text-align: right;
   }
+}
+
+/deep/.el-form-item__error {
+  padding-top: 1px;
 }

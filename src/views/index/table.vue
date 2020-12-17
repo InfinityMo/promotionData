@@ -10,6 +10,7 @@
         <el-table-column v-for="(cloumn,index) in columns"
                          :fixed="cloumn.isFixed"
                          :width="cloumn.width"
+                         :resizable="false"
                          :align="cloumn.align"
                          :key="cloumn.randomKey"
                          :prop="cloumn.key"
@@ -19,6 +20,7 @@
                     v-if="cloumn.edit">
             <div class="reset-header flex-item-center flex-between">
               <i class="edit-success-icon"
+                 @click="submitData"
                  v-if="cloumn.isEdit"></i>
               <i class="edit-icon"
                  @click="toEdit(index)"
@@ -28,14 +30,19 @@
           </template>
           <!-- 插槽-自定义表格 -->
           <template slot-scope="scope">
-            <div v-if="cloumn.edit&&cloumn.isEdit">
-              <el-form-item :prop="cloumn.key+scope.$index"
+            <div v-if="cloumn.edit&&cloumn.isEdit&&scope.row.cellEdit"
+                 class="has-input">
+              <el-form-item :prop="cloumn.key+scope.$index+'.updateData'"
                             class="table-input"
-                            :rules="[{ required: true, message: '请输入', trigger: 'blur' }]">
-                <el-input v-model="editTable[cloumn.key+scope.$index]"></el-input>
+                            :rules="[{ required: true, message: '请输入', trigger: 'blur' },
+                            { pattern: /^\d+(\.\d{0,2})?$/, message: '请输入正确的数字', trigger: 'blur' },
+                            {max: 13 , message: '最大长度13位', trigger: 'blur' }]">
+                <el-input placeholder="请输入"
+                          v-model="editTable[cloumn.key+scope.$index].updateData"></el-input>
               </el-form-item>
             </div>
-            <div v-else>{{scope.row[cloumn.key]}}</div>
+            <div v-else
+                 class="normal-cell">{{scope.row[cloumn.key]}}</div>
           </template>
         </el-table-column>
       </el-table>
@@ -45,16 +52,21 @@
 <script>
 import { column } from './column'
 import { tableData } from './tableData'
+import { mapMutations, mapGetters } from 'vuex'
 export default {
   data () {
     return {
       columns: [],
       tableData: [],
       editTable: {},
-      promotIdArr: []
+      promotIdArr: [],
+      filterLength: 0
     }
   },
   computed: {
+    ...mapGetters([
+      'getCacheData'
+    ]),
     randomKey () {
       return Math.random() * 100000000
     }
@@ -64,6 +76,7 @@ export default {
     this.getTableData()
   },
   methods: {
+    ...mapMutations({ saveCacheData: 'saveCacheData' }),
     getColumns () {
       this.columns = column
       this.columns.forEach(i => {
@@ -112,17 +125,68 @@ export default {
       this.$set(this.columns, index, target)
       if (columnKeyArr.length > 0) {
         const columnKey = target.key
+        const cacheArr = []
         this.tableData.map((item, index) => {
-          this.$set(this.editTable, columnKey + index, item[columnKey])
+          if (item.cellEdit) {
+            // 缓存当前列可编辑的数据
+            cacheArr.push({
+              cacheKey: columnKey + index,
+              updateData: String(parseInt(item[columnKey].replace(/,/g, '')))
+            })
+            this.$set(this.editTable, columnKey + index, {
+              updateDate: columnKey,
+              updateShop: '',
+              promoID: item.promoID,
+              dataType: item.dataType,
+              updateData: String(parseInt(item[columnKey].replace(/,/g, '')))
+            })
+          }
+        })
+        this.saveCacheData(cacheArr)
+      }
+      // console.log(this.editTable)
+    },
+    submitData () {
+      const copyEdittable = JSON.parse(JSON.stringify(this.editTable))
+      if (this.getCacheData.length > 0) {
+        Object.keys(this.editTable).forEach(eachKey => {
+          const target = this.getCacheData.filter(i => i.cacheKey === eachKey)
+          if (target.length > 0) {
+            if (this.editTable[eachKey].updateData === target[0].updateData) {
+              delete copyEdittable[eachKey]
+            }
+          }
         })
       }
-      console.log(this.editTable)
+      console.log(Object.keys(copyEdittable).length)
+      // console.log(copyEdittable)
+      if (Object.keys(copyEdittable).length > 0) {
+        const submitArr = []
+        Object.keys(copyEdittable).map(key => {
+          submitArr.push(copyEdittable[key])
+        })
+        console.log(submitArr)
+      }
     },
+    // tableRowClassName ({ row, rowIndex }) {
+    //   const oldLength = this.filterLength
+    //   const fiterArr = this.promotIdArr.filter(i => i === row.promoID)
+    //   this.filterLength = fiterArr.length
+    //   if (fiterArr.length >= 0) {
+    //     debugger
+    //     if (rowIndex <= fiterArr.length + oldLength) {
+    //       return 'column-stripe'
+    //     } else {
+    //       return 'column-normal'
+    //     }
+    //   } else {
+    //     return ''
+    //   }
+    // },
     // 合并行
     rowMerge ({ row, column, rowIndex, columnIndex }) {
       if (columnIndex === 0) {
         const fiterArr = this.promotIdArr.filter(i => i === row.promoID)
-        console.log(fiterArr)
         if (fiterArr.length > 0) {
           if (rowIndex % fiterArr.length === 0) {
             return {
