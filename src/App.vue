@@ -6,7 +6,11 @@
          element-loading-background="rgba(0, 0, 0, .6)">
       <router-view />
     </div>
-
+    <el-backtop :visibility-height=120
+                :right=10
+                :bottom=30>
+      <i class="back-top-icon"></i>
+    </el-backtop>
   </div>
 </template>
 <script>

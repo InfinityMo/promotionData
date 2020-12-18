@@ -195,5 +195,50 @@ export const tableData = [
     sum: '88',
     stSum: '76',
     monthCompare: '75.99%'
+  }, {
+    promoID: '161718',
+    cellEdit: false,
+    toolType: '直通车',
+    dataType: '加购成本',
+    _12Month1day: '34%',
+    _12Month2day: '100',
+    _12Month3day: '20',
+    _12Month4day: '30',
+    _12Month5day: '20',
+    _12Month6day: '59',
+    _12Month7day: '43',
+    sum: '88',
+    stSum: '76',
+    monthCompare: '75.99%'
+  }, {
+    promoID: '161718',
+    cellEdit: false,
+    toolType: '直通车',
+    dataType: '客单价',
+    _12Month1day: '34%',
+    _12Month2day: '100',
+    _12Month3day: '20',
+    _12Month4day: '30',
+    _12Month5day: '20',
+    _12Month6day: '59',
+    _12Month7day: '43',
+    sum: '88',
+    stSum: '76',
+    monthCompare: '75.99%'
+  }, {
+    promoID: '161718',
+    cellEdit: false,
+    toolType: '直通车',
+    dataType: 'ROI',
+    _12Month1day: '34%',
+    _12Month2day: '100',
+    _12Month3day: '20',
+    _12Month4day: '30',
+    _12Month5day: '20',
+    _12Month6day: '59',
+    _12Month7day: '43',
+    sum: '88',
+    stSum: '76',
+    monthCompare: '75.99%'
   }
 ]

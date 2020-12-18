@@ -3,10 +3,9 @@
     <el-form :model="editTable">
       <el-table :data="tableData"
                 class="custom-table"
-                style="width: 100%"
                 :span-method="rowMerge"
                 border
-                height="460">
+                :height="calcHeight">
         <el-table-column v-for="(cloumn,index) in columns"
                          :fixed="cloumn.isFixed"
                          :width="cloumn.width"
@@ -25,7 +24,10 @@
               <i class="edit-icon"
                  @click="toEdit(index)"
                  v-else></i>
-              <span>{{cloumn.value}}</span>
+              <span v-if="isViewMonth"
+                    @click="viewMonthData(cloumn.key)"
+                    class="view-month">{{cloumn.value}}</span>
+              <span v-else>{{cloumn.value}}</span>
             </div>
           </template>
           <!-- 插槽-自定义表格 -->
@@ -54,24 +56,48 @@ import { column } from './column'
 import { tableData } from './tableData'
 import { mapMutations, mapGetters } from 'vuex'
 export default {
+  props: {
+    form: {
+      type: Object,
+      default: () => { }
+    }
+  },
   data () {
     return {
       columns: [],
       tableData: [],
       editTable: {},
       promotIdArr: [],
-      filterLength: 0
+      filterLength: 0,
+      isViewMonth: false
+    }
+  },
+  watch: {
+    form: {
+      handler (val, oldval) {
+        this.getTableData()
+        // 判断表格数据为月份
+        this.isViewMonth = !!(val.timeType === 5 || val.timeType === 6)
+      },
+      deep: true
     }
   },
   computed: {
     ...mapGetters([
       'getCacheData'
     ]),
+    calcHeight () {
+      let height = 0
+      const clientHeight = document.documentElement.clientHeight || document.body.clientHeight
+      height = clientHeight - 165
+      return height
+    },
     randomKey () {
       return Math.random() * 100000000
     }
   },
   created () {
+    console.log(this.form)
     this.getColumns()
     this.getTableData()
   },
@@ -105,6 +131,7 @@ export default {
       })
     },
     getTableData () {
+      this.tableData = []
       this.tableData = tableData
       this.tableData.map(i => {
         this.promotIdArr.push(i.promoID)
@@ -167,6 +194,9 @@ export default {
         })
         console.log(submitArr)
       }
+    },
+    viewMonthData (columnKey) {
+      this.$emit('monthDialog', columnKey)
     },
     // tableRowClassName ({ row, rowIndex }) {
     //   const oldLength = this.filterLength

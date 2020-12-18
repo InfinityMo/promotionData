@@ -73,8 +73,8 @@
             <el-row class="row ">
               <el-col :span="8">
                 <el-form-item label="推广工具："
-                              prop="extend">
-                  <el-cascader v-model="searchForm.extend"
+                              prop="dataType">
+                  <el-cascader v-model="searchForm.dataType"
                                :options="extendOptions"
                                :props="{ multiple: true }"
                                collapse-tags
@@ -120,12 +120,20 @@
             </div>
           </div>
           <!-- table -->
-          <Table />
+          <Table :form="submitForm"
+                 @monthDialog="openMonthDialog" />
         </div>
       </div>
     </div>
-
-    <el-backtop target=".main-content"></el-backtop>
+    <el-dialog title="yuefen"
+               custom-class="journal-dialog"
+               width="1000px"
+               top="40px"
+               :modal="true"
+               :destroy-on-close="true"
+               :visible.sync="monthDataShow">
+      <Table :form="monthForm" />
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -143,12 +151,27 @@ export default {
         timeType: '',
         month: '', // 日期
         shop: '',
-        extend: ''
+        tool: ''
       },
       timeSection: [], // 时间范围
+      submitForm: {
+        timeType: '',
+        startDate: '',
+        endDate: '',
+        shop: '',
+        dataType: ''
+      },
+      monthForm: {
+        timeType: '',
+        startDate: '',
+        endDate: '',
+        shop: '',
+        dataType: ''
+      },
       timeTypeArr: timeTypeArr,
       shopArr: shopArr,
-      extendOptions: extendOptions
+      extendOptions: extendOptions,
+      monthDataShow: false
     }
   },
   watch: {
@@ -165,7 +188,19 @@ export default {
       if (this.searchForm.month) {
         this.fromatMonth()
       }
+      this.submitForm = Object.assign({}, {
+        timeType: this.searchForm.timeType,
+        startDate: this.timeSection[0],
+        endDate: this.timeSection[1],
+        shop: this.searchForm.shop,
+        dataType: this.searchForm.dataType || ''
+      })
+      // 向下滚动到表格区域
       scrollTo(135)
+    },
+    openMonthDialog (columnKey) {
+      this.monthForm = { ...this.submitForm }
+      this.monthDataShow = true
     }
   }
 }
