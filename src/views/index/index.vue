@@ -154,11 +154,11 @@ export default {
         timeType: 1,
         month: '', // 日期
         shop: '',
-        tool: ''
+        dataType: []
       },
       timeSection: [], // 时间范围
       submitForm: {
-        timeType: '',
+        timeType: 1,
         startDate: '',
         endDate: '',
         shop: '',
@@ -191,9 +191,15 @@ export default {
     getSelectData () {
       this._getSelectData(1).then(res => {
         this.shopArr = res
+        this.searchForm.shop = res[0].value
       })
       this._getCascader(2).then(res => {
         this.extendOptions = res
+
+        this.extendOptions[0].children.map(i => {
+          this.searchForm.dataType.push([this.extendOptions[0].value, i.value])
+        })
+        console.log(this.searchForm.dataType)
       })
     },
     searchHandle () {
@@ -201,6 +207,7 @@ export default {
         this.fromatMonth()
       }
       const dataTypeArr = []
+      console.log(this.searchForm.dataType)
       this.searchForm.dataType.map(i => {
         dataTypeArr.push(i[1] || '')
       })
