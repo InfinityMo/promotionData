@@ -19,17 +19,19 @@
                    class="user-login-userName"></i>
               </el-input>
             </el-form-item>
-            <el-form-item prop="userpassword"
+            <el-form-item prop="userPassword"
                           class="form-item">
               <el-input placeholder="请输入用户密码"
-                        v-model="loginForm.userpassword">
+                        v-model="loginForm.userPassword"
+                        show-password>
                 <i slot="prefix"
                    class="user-login-password"></i>
               </el-input>
             </el-form-item>
             <el-form-item>
               <el-button class="login-btn"
-                         type="primary">登录</el-button>
+                         type="primary"
+                         @click="login">登录</el-button>
             </el-form-item>
           </el-form>
           <div class="bottom-tip flex-item-center">
@@ -39,7 +41,6 @@
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </template>
@@ -50,9 +51,27 @@ export default {
     return {
       loginForm: {
         userName: '',
-        userpassword: ''
+        userPassword: ''
       },
-      loginRules: {}
+      loginRules: {
+        userName: [
+          { required: true, message: '请输入用户名', trigger: 'blur' }
+        ],
+        userPassword: [
+          { required: true, message: '请输入密码', trigger: 'blur' }
+        ]
+      }
+    }
+  },
+  methods: {
+    login () {
+      this.$refs.loginForm.validate((valid) => {
+        if (valid) {
+          this.$router.push('./promot')
+        } else {
+          return false
+        }
+      })
     }
   }
 }
