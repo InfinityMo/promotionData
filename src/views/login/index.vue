@@ -11,10 +11,10 @@
           <el-form :model="loginForm"
                    :rules="loginRules"
                    ref="loginForm">
-            <el-form-item prop="userName"
+            <el-form-item prop="userAccount"
                           class="form-item">
               <el-input placeholder="请输入用户名"
-                        v-model="loginForm.userName">
+                        v-model="loginForm.userAccount">
                 <i slot="prefix"
                    class="user-login-userName"></i>
               </el-input>
@@ -45,16 +45,17 @@
   </div>
 </template>
 <script>
-
+import { mapActions } from 'vuex'
+// import { Base64 } from 'js-base64'
 export default {
   data () {
     return {
       loginForm: {
-        userName: '',
+        userAccount: '',
         userPassword: ''
       },
       loginRules: {
-        userName: [
+        userAccount: [
           { required: true, message: '请输入用户名', trigger: 'blur' }
         ],
         userPassword: [
@@ -64,10 +65,17 @@ export default {
     }
   },
   methods: {
+    ...mapActions([
+      'getUserInfo'
+    ]),
     login () {
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
-          this.$router.push('./promot')
+          this.getUserInfo(this.loginForm).then(res => {
+            if (res) {
+              this.$router.push('./promot')
+            }
+          })
         } else {
           return false
         }

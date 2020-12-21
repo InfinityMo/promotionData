@@ -125,13 +125,15 @@
         </div>
       </div>
     </div>
-    <el-dialog title="yuefen"
-               custom-class="journal-dialog"
+    <el-dialog custom-class="journal-dialog"
                width="1000px"
                top="40px"
                :modal="true"
                :destroy-on-close="true"
                :visible.sync="monthDataShow">
+      <div slot="title">
+        <span>{{timeTypeSelect}}</span><em v-show="timeTypeSelect!==''&&shopSelect!==''">，</em><span>{{shopSelect}}</span>
+      </div>
       <Table :form="monthForm" />
     </el-dialog>
   </div>

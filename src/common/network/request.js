@@ -43,7 +43,7 @@ const removePending = (config) => {
   for (const p in pending) {
     if (pending[p].url === url) {
       pending[p].cancel('cancelToken')
-      store.commit('setSpinning', false)
+      store.commit('SETSPINNING', false)
       pending.splice(p, 1)
     }
   }
@@ -67,7 +67,7 @@ instance.interceptors.request.use(
 )
 // 添加响应拦截器
 instance.interceptors.response.use(response => {
-  store.commit('setSpinning', false)
+  store.commit('SETSPINNING', false)
   // errorCode为1时，请求成功，其余状态皆为失败
   if (response.data.errorCode === 1) {
     // removePending(response.config) // 在一个ajax响应后再执行一下取消操作，把已经完成的请求从pending中移除
@@ -77,7 +77,7 @@ instance.interceptors.response.use(response => {
     return Promise.reject(response.data.errorMsg)
   }
 }, error => {
-  store.commit('setSpinning', false)
+  store.commit('SETSPINNING', false)
   // 如果错误是axios.Cancel构造出来的实例则说明多余的请求被拦截掉了，直接返回promise抛出错误信息
   // if (error.constructor === axios.Cancel) return Promise.reject(error)
   // 添加前端提示code
@@ -108,20 +108,20 @@ export default {
   post (url, params, spinning) {
     trimParams(params)
     if (!spinning) {
-      store.commit('setSpinning', true)
+      store.commit('SETSPINNING', true)
     }
     return instance.post(url, params)
   },
   // get 请求
   get (url, params, spinning) {
     if (!spinning) {
-      store.commit('setSpinning', true)
+      store.commit('SETSPINNING', true)
     }
     return instance.get(url, params)
   },
   mock (url, params, spinning) {
     return axios.get(url).then(res => {
-      store.commit('setSpinning', false)
+      store.commit('SETSPINNING', false)
       return res.data
     })
   }

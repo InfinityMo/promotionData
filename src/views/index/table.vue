@@ -102,7 +102,7 @@ export default {
     this.getTableData()
   },
   methods: {
-    ...mapMutations({ saveCacheData: 'saveCacheData' }),
+    ...mapMutations({ SAVECACHEDATA: 'SAVECACHEDATA' }),
     getColumns () {
       this.columns = column
       this.columns.forEach(i => {
@@ -132,6 +132,7 @@ export default {
     },
     getTableData () {
       this.tableData = []
+      this.promotIdArr = []
       this.tableData = tableData
       this.tableData.map(i => {
         this.promotIdArr.push(i.promoID)
@@ -169,7 +170,7 @@ export default {
             })
           }
         })
-        this.saveCacheData(cacheArr)
+        this.SAVECACHEDATA(cacheArr)
       }
       // console.log(this.editTable)
     },

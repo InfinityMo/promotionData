@@ -12,8 +12,8 @@
                       popper-class="user-popover">
             <div slot="reference">
               <div class="flex-item-center user-info">
-                <div><img src="@/assets/img/custom/cat2.jpg"></div>
-                <p>欢迎您！Infinity</p>
+                <div><img :src="userData.userImg"></div>
+                <p>欢迎您！{{userData.userName}}</p>
               </div>
             </div>
             <div class="user-operate">
@@ -86,7 +86,7 @@
 </template>
 
 <script>
-
+import { mapGetters } from 'vuex'
 export default {
   data () {
     var checkPwd = (rule, value, callback) => {
@@ -228,6 +228,9 @@ export default {
       }
     }
   },
+  computed: {
+    ...mapGetters({ userData: 'getUserData' })
+  },
   methods: {
     viewJournal () {
       this.journalShow = true
@@ -253,8 +256,9 @@ export default {
       })
     },
     logout () {
-      // // 清除用户session
+      // 清除用户session
       this.$router.push('./')
+      sessionStorage.removeItem('userData')
     }
   }
 }
