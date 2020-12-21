@@ -52,7 +52,7 @@
   </div>
 </template>
 <script>
-import { column } from './column'
+
 import { tableData } from './tableData'
 import { mapMutations, mapGetters } from 'vuex'
 export default {
@@ -75,6 +75,7 @@ export default {
   watch: {
     form: {
       handler (val, oldval) {
+        this.getColumns()
         this.getTableData()
         // 判断表格数据为月份
         this.isViewMonth = !!(val.timeType === 5 || val.timeType === 6)
@@ -104,30 +105,32 @@ export default {
   methods: {
     ...mapMutations({ SAVECACHEDATA: 'SAVECACHEDATA' }),
     getColumns () {
-      this.columns = column
-      this.columns.forEach(i => {
-        i.randomKey = Math.random() * 100000000
-        if (i.edit) {
-          i.isEdit = false
-        }
-        if (i.key === 'toolType' || i.key === 'dataType') {
-          i.isFixed = true
-          i.align = 'left'
-          if (i.key === 'toolType') {
-            i.width = '153'
+      this.$request.post('/getColumn', this.form).then(res => {
+        this.columns = res.data
+        this.columns.forEach(i => {
+          i.randomKey = Math.random() * 100000000
+          if (i.edit) {
+            i.isEdit = false
           }
-          if (i.key === 'dataType') {
-            i.width = '196'
-          }
-        } else {
-          if (i.key === 'yearCompare' || i.key === 'monthCompare') {
-            i.width = '92'
+          if (i.key === 'toolType' || i.key === 'dataType') {
+            i.isFixed = true
+            i.align = 'left'
+            if (i.key === 'toolType') {
+              i.width = '153'
+            }
+            if (i.key === 'dataType') {
+              i.width = '196'
+            }
           } else {
-            i.width = '153'
+            if (i.key === 'yearCompare' || i.key === 'monthCompare') {
+              i.width = '92'
+            } else {
+              i.width = '153'
+            }
+            i.align = 'right'
+            i.isFixed = false
           }
-          i.align = 'right'
-          i.isFixed = false
-        }
+        })
       })
     },
     getTableData () {

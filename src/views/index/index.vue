@@ -74,7 +74,8 @@
               <el-col :span="8">
                 <el-form-item label="推广工具："
                               prop="dataType">
-                  <el-cascader v-model="searchForm.dataType"
+                  <el-cascader placeholder="请选择推广工具"
+                               v-model="searchForm.dataType"
                                :options="extendOptions"
                                :props="{ multiple: true }"
                                collapse-tags
@@ -142,7 +143,7 @@
 import tableMixin from '@/mixins/dealTable'
 import HeaderTop from '@/components/header'
 import { scrollTo } from '@/common/utils/funcStore'
-import { timeTypeArr, shopArr, extendOptions } from './data'
+import { timeTypeArr } from './data'
 import Table from './table'
 export default {
   mixins: [tableMixin],
@@ -150,7 +151,7 @@ export default {
   data () {
     return {
       searchForm: {
-        timeType: '',
+        timeType: 1,
         month: '', // 日期
         shop: '',
         tool: ''
@@ -171,31 +172,44 @@ export default {
         dataType: ''
       },
       timeTypeArr: timeTypeArr,
-      shopArr: shopArr,
-      extendOptions: extendOptions,
+      shopArr: [],
+      extendOptions: [],
       monthDataShow: false
     }
   },
   watch: {
 
   },
-  async created () {
-
+  created () {
+    this.getSelectData()
+    this.timeTypeChange(1)
   },
   mounted () {
 
   },
   methods: {
+    getSelectData () {
+      this._getSelectData(1).then(res => {
+        this.shopArr = res
+      })
+      this._getCascader(2).then(res => {
+        this.extendOptions = res
+      })
+    },
     searchHandle () {
       if (this.searchForm.month) {
         this.fromatMonth()
       }
+      const dataTypeArr = []
+      this.searchForm.dataType.map(i => {
+        dataTypeArr.push(i[1] || '')
+      })
       this.submitForm = Object.assign({}, {
         timeType: this.searchForm.timeType,
         startDate: this.timeSection[0],
         endDate: this.timeSection[1],
         shop: this.searchForm.shop,
-        dataType: this.searchForm.dataType || ''
+        dataType: dataTypeArr.join() || ''
       })
       // 向下滚动到表格区域
       scrollTo(135)

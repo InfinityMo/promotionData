@@ -29,20 +29,6 @@ export const timeTypeArr = [
   }
 ]
 
-export const shopArr = [
-  {
-    value: 1,
-    label: '悦诗风吟'
-  },
-  {
-    value: 2,
-    label: '花王'
-  },
-  {
-    value: 3,
-    label: '珂润'
-  }
-]
 export const extendOptions = [
   {
     value: '1',

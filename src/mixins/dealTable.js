@@ -47,11 +47,57 @@ const mixins = {
       const target = this.shopArr.filter(i => i.value === this.searchForm.shop)
       return target.length > 0 ? target[0].label : ''
     }
+
   },
   watch: {
 
   },
   methods: {
+    _getSelectData (type) {
+      const option = []
+      return new Promise((resolve, reject) => {
+        this.$request.post('/dropdownlist', { dropDownListType: type }).then(res => {
+          const dropData = res.data || []
+          dropData.map((i) => {
+            option.push({
+              value: i.value,
+              label: i.name
+            })
+          })
+          resolve(option)
+        }).catch(err => {
+          reject(err)
+        })
+      })
+    },
+    _getCascader (type) {
+      const option = []
+      return new Promise((resolve, reject) => {
+        this.$request.post('/dropdownlist', { dropDownListType: type }).then(res => {
+          const dropData = res.data || []
+          dropData.map((i) => {
+            option.push({
+              value: i.value,
+              label: i.name,
+              children: i.children && i.children.length > 0 ? this._setChild(i.children) : []
+            })
+          })
+          resolve(option)
+        }).catch(err => {
+          reject(err)
+        })
+      })
+    },
+    _setChild (arr) {
+      const child = []
+      arr.map(i => {
+        child.push({
+          value: i.value,
+          label: i.name
+        })
+      })
+      return child
+    },
     // 处理时间
     timeTypeChange (timeType) {
       this.timeSection = []
