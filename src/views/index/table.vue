@@ -12,7 +12,7 @@
                          :width="cloumn.width"
                          :resizable="false"
                          :align="cloumn.align"
-                         :key="cloumn.randomKey"
+                         :key="cloumn.key"
                          :prop="cloumn.key"
                          :label="cloumn.value">
           <!-- 插槽-自定义表头 -->
@@ -38,8 +38,8 @@
               <el-form-item :prop="cloumn.key+scope.$index+'.updateData'"
                             class="table-input"
                             :rules="[{ required: true, message: '请输入', trigger: 'blur' },
-                            { pattern: /^\d+(\.\d{0,2})?$/, message: '请输入正确的数字', trigger: 'blur' },
-                            {max: 13 , message: '最大长度13位', trigger: 'blur' }]">
+                            { pattern: /^\d+(\.\d{0,3})?$/, message: '请输入正确的数字', trigger: 'blur' },
+                            {max: 14 , message: '最大长度14位', trigger: 'blur' }]">
                 <el-input placeholder="请输入"
                           v-model="editTable[cloumn.key+scope.$index].updateData"></el-input>
               </el-form-item>
@@ -106,6 +106,7 @@ export default {
   methods: {
     ...mapMutations({ SAVECACHEDATA: 'SAVECACHEDATA' }),
     getColumns () {
+      this.columns = []
       this.$request.post('/getColumn', this.form).then(res => {
         this.columns = res.data
         this.columns.forEach(i => {
@@ -144,16 +145,17 @@ export default {
     getTableData () {
       this.tableData = []
       this.promotIdArr = []
+      this.tableKey = createUUID()
       this.$request.post('/getList', this.form).then(res => {
         this.tableData = res.data || []
         this.tableData.map(i => {
           this.promotIdArr.push(i.promoID)
         })
         // 刷新table dom
-        this.tableKey = createUUID()
         this.$emit('tableRender', true)
-        // console.log(this.promotIdArr)
-        console.log(this.tableKey)
+        // // console.log(this.promotIdArr)
+        // console.log(this.tableKey)
+        // this.$forceUpdate()
       })
     },
     toEdit (index) {
@@ -175,18 +177,33 @@ export default {
         const cacheArr = []
         this.tableData.map((item, index) => {
           if (item.cellEdit) {
-            // 缓存当前列可编辑的数据
-            cacheArr.push({
-              cacheKey: columnKey + index,
-              updateData: isNaN(String(parseInt(item[columnKey].replace(/,/g, '')))) ? '0' : String(parseInt(item[columnKey].replace(/,/g, '')))
-            })
-            this.$set(this.editTable, columnKey + index, {
-              updateDate: columnKey,
-              updateShop: '',
-              promoID: item.promoID,
-              dataType: item.dataType,
-              updateData: isNaN(String(parseInt(item[columnKey].replace(/,/g, '')))) ? '0' : String(parseInt(item[columnKey].replace(/,/g, '')))
-            })
+            if (item.promoID === 1 && item.dataID === 3) {
+              // 缓存当前列可编辑的数据
+              cacheArr.push({
+                cacheKey: columnKey + index,
+                updateData: item[columnKey]
+              })
+              this.$set(this.editTable, columnKey + index, {
+                updateDate: columnKey,
+                updateShop: '',
+                promoID: item.promoID,
+                dataType: item.dataType,
+                updateData: item[columnKey]
+              })
+            } else {
+              // 缓存当前列可编辑的数据
+              cacheArr.push({
+                cacheKey: columnKey + index,
+                updateData: isNaN(String(parseInt(item[columnKey].replace(/,/g, '')))) ? '0' : String(parseInt(item[columnKey].replace(/,/g, '')))
+              })
+              this.$set(this.editTable, columnKey + index, {
+                updateDate: columnKey,
+                updateShop: '',
+                promoID: item.promoID,
+                dataType: item.dataType,
+                updateData: isNaN(String(parseInt(item[columnKey].replace(/,/g, '')))) ? '0' : String(parseInt(item[columnKey].replace(/,/g, '')))
+              })
+            }
           }
         })
         this.SAVECACHEDATA(cacheArr)
@@ -216,8 +233,13 @@ export default {
           dataJson: JSON.stringify(submitArr)
         }).then(res => {
           if (res.errorCode === 1) {
-            this.$message.success('保存成功')
-            this.getTableData()
+            if (res.data) {
+              this.$message.warning(res.data)
+            } else {
+              this.$message.success('保存成功')
+              this.getColumns()
+              this.getTableData()
+            }
           }
         })
       }

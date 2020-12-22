@@ -6,6 +6,7 @@ time：2020-8-17
 import router from '@/router/index'
 // import store from '@/store/index'
 // import store from '@/store/index'
+
 router.beforeEach((to, from, next) => {
   const whiteList = ['/401', '/403', '/404']
 
@@ -23,7 +24,6 @@ router.beforeEach((to, from, next) => {
   if (Object.keys(userData).length > 0) {
     next()
   } else {
-    to.path = '/'
-    next()
+    next('/')
   }
 })
