@@ -123,7 +123,8 @@
           <!-- table -->
           <Table :form="submitForm"
                  v-if="isShowTable"
-                 @monthDialog="openMonthDialog" />
+                 @monthDialog="openMonthDialog"
+                 @tableRender="tableRender" />
         </div>
       </div>
     </div>
@@ -144,6 +145,7 @@
 import tableMixin from '@/mixins/dealTable'
 import HeaderTop from '@/components/header'
 import { scrollTo } from '@/common/utils/funcStore'
+import watermark from '@/common/utils/watermark'
 import { timeTypeArr } from './data'
 import Table from './table'
 export default {
@@ -177,7 +179,8 @@ export default {
       extendOptions: [],
       monthDataShow: false,
       randomKey: 1,
-      isShowTable: false
+      isShowTable: false,
+      searchClick: false
     }
   },
   watch: {
@@ -188,7 +191,10 @@ export default {
     this.timeTypeChange(1)
   },
   mounted () {
-
+    //
+    this.$nextTick(() => {
+      watermark.set('TL-1563-Infinity')
+    })
   },
   methods: {
     getSelectData () {
@@ -215,6 +221,7 @@ export default {
       //   this.fromatMonth()
       //   console.log(this.fromatMonth())
       // }
+      this.searchClick = true
       const dataTypeArr = []
       this.searchForm.dataType.map(i => {
         dataTypeArr.push(i[1] || '')
@@ -227,7 +234,11 @@ export default {
         dataType: dataTypeArr.join() || ''
       })
       // 向下滚动到表格区域
-      scrollTo(135)
+    },
+    tableRender () {
+      if (this.searchClick) {
+        scrollTo(135)
+      }
     },
     openMonthDialog (columnKey) {
       this.monthForm = { ...this.submitForm }

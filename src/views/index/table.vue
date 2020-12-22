@@ -144,6 +144,7 @@ export default {
         })
         // 刷新table dom
         this.tableKey = createUUID()
+        this.$emit('tableRender', true)
         // console.log(this.promotIdArr)
         console.log(this.tableKey)
       })
