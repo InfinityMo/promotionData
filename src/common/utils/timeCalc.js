@@ -90,10 +90,8 @@ export function monthSpliceDay (monthYear) {
   // 指定月份的最后一天
   var pointMonthLastDay = new Date(pointYear, pointMonth, 0).getDate()
   if (nowMonth === pointMonth) {
-    console.log([`${pointYear}-${pointMonth}-01`, `${pointYear}-${pointMonth}-${prevOneDate}`])
     return [`${pointYear}-${pointMonth}-01`, `${pointYear}-${pointMonth}-${prevOneDate}`]
   } else {
-    console.log([`${pointYear}-${pointMonth}-01`, `${pointYear}-${pointMonth}-${pointMonthLastDay}`])
     return [`${pointYear}-${pointMonth}-01`, `${pointYear}-${pointMonth}-${pointMonthLastDay}`]
   }
 }

@@ -4,6 +4,7 @@
       <el-table :data="tableData"
                 class="custom-table"
                 :span-method="rowMerge"
+                :key="tableKey"
                 border
                 :height="calcHeight">
         <el-table-column v-for="(cloumn,index) in columns"
@@ -53,7 +54,9 @@
 </template>
 <script>
 
-import { tableData } from './tableData'
+// import { tableData } from './tableData'
+// import { column } from './column'
+import { createUUID } from '@/common/utils/funcStore'
 import { mapMutations, mapGetters } from 'vuex'
 export default {
   props: {
@@ -69,7 +72,8 @@ export default {
       editTable: {},
       promotIdArr: [],
       filterLength: 0,
-      isViewMonth: false
+      isViewMonth: false,
+      tableKey: 1
     }
   },
   watch: {
@@ -92,13 +96,10 @@ export default {
       const clientHeight = document.documentElement.clientHeight || document.body.clientHeight
       height = clientHeight - 165
       return height
-    },
-    randomKey () {
-      return Math.random() * 100000000
     }
   },
   created () {
-    console.log(this.form)
+    // console.log(this.form)
     this.getColumns()
     this.getTableData()
   },
@@ -108,14 +109,14 @@ export default {
       this.$request.post('/getColumn', this.form).then(res => {
         this.columns = res.data
         this.columns.forEach(i => {
-          i.randomKey = Math.random() * 100000000
+          i.randomKey = createUUID()
           if (i.edit) {
             i.isEdit = false
           }
-          if (i.key === 'toolType' || i.key === 'dataType') {
+          if (i.key === 'promoType' || i.key === 'dataType') {
             i.isFixed = true
             i.align = 'left'
-            if (i.key === 'toolType') {
+            if (i.key === 'promoType') {
               i.width = '153'
             }
             if (i.key === 'dataType') {
@@ -136,9 +137,15 @@ export default {
     getTableData () {
       this.tableData = []
       this.promotIdArr = []
-      this.tableData = tableData
-      this.tableData.map(i => {
-        this.promotIdArr.push(i.promoID)
+      this.$request.post('/getList', this.form).then(res => {
+        this.tableData = res.data || []
+        this.tableData.map(i => {
+          this.promotIdArr.push(i.promoID)
+        })
+        // 刷新table dom
+        this.tableKey = createUUID()
+        // console.log(this.promotIdArr)
+        console.log(this.tableKey)
       })
     },
     toEdit (index) {
@@ -152,8 +159,9 @@ export default {
       })
       const target = this.columns[index]
       target.isEdit = true
-      target.randomKey = Math.random() * 100000000
+      target.randomKey = createUUID()
       this.$set(this.columns, index, target)
+      this.$forceUpdate()
       if (columnKeyArr.length > 0) {
         const columnKey = target.key
         const cacheArr = []
@@ -162,20 +170,21 @@ export default {
             // 缓存当前列可编辑的数据
             cacheArr.push({
               cacheKey: columnKey + index,
-              updateData: String(parseInt(item[columnKey].replace(/,/g, '')))
+              updateData: isNaN(String(parseInt(item[columnKey].replace(/,/g, '')))) ? '0' : String(parseInt(item[columnKey].replace(/,/g, '')))
             })
             this.$set(this.editTable, columnKey + index, {
               updateDate: columnKey,
               updateShop: '',
               promoID: item.promoID,
               dataType: item.dataType,
-              updateData: String(parseInt(item[columnKey].replace(/,/g, '')))
+              updateData: isNaN(String(parseInt(item[columnKey].replace(/,/g, '')))) ? '0' : String(parseInt(item[columnKey].replace(/,/g, '')))
             })
           }
         })
         this.SAVECACHEDATA(cacheArr)
       }
-      // console.log(this.editTable)
+      // 刷新table dom
+      this.tableKey = createUUID()
     },
     submitData () {
       const copyEdittable = JSON.parse(JSON.stringify(this.editTable))
@@ -189,8 +198,6 @@ export default {
           }
         })
       }
-      console.log(Object.keys(copyEdittable).length)
-      // console.log(copyEdittable)
       if (Object.keys(copyEdittable).length > 0) {
         const submitArr = []
         Object.keys(copyEdittable).map(key => {
@@ -218,25 +225,59 @@ export default {
     //   }
     // },
     // 合并行
+
+    formatRowspanAndColspan (tableData, tableKey) {
+      const newArr = []
+      // 分类检出tempList中的数据push到newArr中
+      for (let i = 0; i < tableData.length;) {
+        let count = 0
+        for (let j = i; j < tableData.length; j++) {
+          if (tableKey === 'promoID') {
+            if (tableData[i].promoID === tableData[j].promoID) {
+              count++
+            }
+          }
+        }
+        if (tableKey === 'promoID') {
+          newArr.push({
+            data: tableData[i].promoID,
+            num: count
+          })
+        }
+        i += count
+      }
+      // 格式化newArr中的数据
+      for (let k = 0; k < newArr.length; k++) {
+        if (newArr[k].num > 1 || newArr[k].num === 0) {
+          for (let w = k; w < newArr[k].num + k - 1; w++) {
+            newArr.splice(w + 1, 0, {
+              data: newArr[k].data,
+              num: 0
+            })
+          }
+        }
+      }
+      return newArr
+    },
     rowMerge ({ row, column, rowIndex, columnIndex }) {
+      // 合并第一列
+      const newArr = this.formatRowspanAndColspan(this.tableData, 'promoID')
       if (columnIndex === 0) {
-        const fiterArr = this.promotIdArr.filter(i => i === row.promoID)
-        if (fiterArr.length > 0) {
-          if (rowIndex % fiterArr.length === 0) {
-            return {
-              rowspan: fiterArr.length,
-              colspan: 1
-            }
-          } else {
-            return {
-              rowspan: 0,
-              colspan: 0
-            }
+        const num = newArr[rowIndex].num
+        if (num > 1) {
+          return {
+            rowspan: num,
+            colspan: 1
+          }
+        } else if (num < 1) {
+          return {
+            rowspan: 1,
+            colspan: num
           }
         } else {
           return {
-            rowspan: 0,
-            colspan: 0
+            rowspan: 1,
+            colspan: 1
           }
         }
       }

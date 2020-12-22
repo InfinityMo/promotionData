@@ -85,7 +85,7 @@
               </el-col>
               <el-col :span="16">
                 <el-form-item class="search-btn">
-                  <el-button @click="resetForm('searchForm')">重置</el-button>
+                  <!-- <el-button @click="resetForm('searchForm')">重置</el-button> -->
                   <el-button type="primary"
                              @click="searchHandle">查询</el-button>
                 </el-form-item>
@@ -122,6 +122,7 @@
           </div>
           <!-- table -->
           <Table :form="submitForm"
+                 v-if="isShowTable"
                  @monthDialog="openMonthDialog" />
         </div>
       </div>
@@ -162,19 +163,21 @@ export default {
         startDate: '',
         endDate: '',
         shop: '',
-        dataType: ''
+        dataType: []
       },
       monthForm: {
         timeType: '',
         startDate: '',
         endDate: '',
         shop: '',
-        dataType: ''
+        dataType: []
       },
       timeTypeArr: timeTypeArr,
       shopArr: [],
       extendOptions: [],
-      monthDataShow: false
+      monthDataShow: false,
+      randomKey: 1,
+      isShowTable: false
     }
   },
   watch: {
@@ -189,32 +192,37 @@ export default {
   },
   methods: {
     getSelectData () {
-      this._getSelectData(1).then(res => {
-        this.shopArr = res
-        this.searchForm.shop = res[0].value
-      })
-      this._getCascader(2).then(res => {
-        this.extendOptions = res
-
+      Promise.all([this._getSelectData(1), this._getCascader(2)]).then(res => {
+        this.shopArr = res[0]
+        this.searchForm.shop = this.shopArr[2].value
+        this.submitForm.shop = this.shopArr[2].value
+        this.extendOptions = res[1]
         this.extendOptions[0].children.map(i => {
           this.searchForm.dataType.push([this.extendOptions[0].value, i.value])
         })
-        console.log(this.searchForm.dataType)
+        const dataTypeArr = []
+        this.searchForm.dataType.map(i => {
+          dataTypeArr.push(i[1] || '')
+        })
+        this.submitForm.dataType = dataTypeArr.join()
+        this.submitForm.startDate = this.timeSection[0]
+        this.submitForm.endDate = this.timeSection[1]
+        this.isShowTable = true
       })
     },
     searchHandle () {
-      if (this.searchForm.month) {
-        this.fromatMonth()
-      }
+      // if (this.searchForm.month) {
+      //   this.fromatMonth()
+      //   console.log(this.fromatMonth())
+      // }
       const dataTypeArr = []
-      console.log(this.searchForm.dataType)
       this.searchForm.dataType.map(i => {
         dataTypeArr.push(i[1] || '')
       })
       this.submitForm = Object.assign({}, {
         timeType: this.searchForm.timeType,
-        startDate: this.timeSection[0],
-        endDate: this.timeSection[1],
+        startDate: this.timeSection[0] || this.fromatMonth()[0],
+        endDate: this.timeSection[1] || this.fromatMonth()[1],
         shop: this.searchForm.shop,
         dataType: dataTypeArr.join() || ''
       })

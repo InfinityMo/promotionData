@@ -8,6 +8,7 @@ import router from '@/router/index'
 // import store from '@/store/index'
 router.beforeEach((to, from, next) => {
   const whiteList = ['/401', '/403', '/404']
+
   if (to.path === '/') {
     next()
     return
@@ -17,5 +18,12 @@ router.beforeEach((to, from, next) => {
     return
   }
   const userData = JSON.parse(sessionStorage.getItem('userData')) || {}
-  Object.keys(userData).length > 0 ? next() : to.path = '/'
+
+  // userData && Object.keys(userData).length > 0 ? : to.path = '/'
+  if (Object.keys(userData).length > 0) {
+    next()
+  } else {
+    to.path = '/'
+    next()
+  }
 })

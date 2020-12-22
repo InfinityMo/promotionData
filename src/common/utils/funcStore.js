@@ -67,6 +67,7 @@ export function dateFormat (fmt, date) {
   }
   return fmt
 }
+// 千分位加逗号
 export function setTousandNum (num) {
   const res = num.toString().replace(/\d+/, function (n) { // 先提取整数部分
     return n.replace(/(\d)(?=(\d{3})+$)/g, function ($1) {
@@ -74,4 +75,24 @@ export function setTousandNum (num) {
     })
   })
   return res
+}
+// 生成uuid
+export function createUUID (length = 128) {
+  var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('')
+  var uuid = new Array(length)
+  var rnd = 0
+  var r
+  for (var i = 0; i < length; i++) {
+    if (i === 8 || i === 13 || i === 18 || i === 23) {
+      uuid[i] = '-'
+    } else if (i === 14) {
+      uuid[i] = '4'
+    } else {
+      if (rnd <= 0x02) { rnd = 0x2000000 + (Math.random() * 0x1000000) | 0 }
+      r = rnd & 0xf
+      rnd = rnd >> 4
+      uuid[i] = chars[(i === 19) ? (r & 0x3) | 0x8 : r]
+    }
+  }
+  return uuid.join('').replace(/[-]/g, '').toLowerCase()
 }

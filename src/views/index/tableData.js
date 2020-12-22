@@ -1,8 +1,8 @@
 export const tableData = [
   {
     promoID: '123',
-    cellEdit: true,
-    toolType: '淘宝（定向计划）',
+    cellEdit: 0,
+    promoType: '淘宝（定向计划）',
     dataType: '店铺总点击（生意参谋）',
     _12Month1day: '300,000,000.00',
     _12Month2day: '200,376.00',
@@ -18,8 +18,8 @@ export const tableData = [
   },
   {
     promoID: '123',
-    cellEdit: true,
-    toolType: '淘宝（定向计划）',
+    cellEdit: 0,
+    promoType: '淘宝（定向计划）',
     dataType: '付款笔数',
     _12Month1day: '357.00',
     _12Month2day: '200,376.00',
@@ -35,8 +35,8 @@ export const tableData = [
   },
   {
     promoID: '123',
-    cellEdit: true,
-    toolType: '淘宝（定向计划）',
+    cellEdit: 1,
+    promoType: '淘宝（定向计划）',
     dataType: 'UV价值',
     _12Month1day: '346.00',
     _12Month2day: '200,376.00',
@@ -51,8 +51,8 @@ export const tableData = [
     monthCompare: '75.99%'
   }, {
     promoID: '456',
-    cellEdit: true,
-    toolType: '汇总',
+    cellEdit: 1,
+    promoType: '汇总',
     dataType: '店铺总点击（生意参谋）',
     _12Month1day: '3422.00',
     _12Month2day: '200,376.00',
@@ -68,8 +68,8 @@ export const tableData = [
   },
   {
     promoID: '456',
-    cellEdit: true,
-    toolType: '汇总',
+    cellEdit: 1,
+    promoType: '汇总',
     dataType: '付款笔数',
     _12Month1day: '78.00',
     _12Month2day: '200,376.00',
@@ -85,8 +85,8 @@ export const tableData = [
   },
   {
     promoID: '456',
-    cellEdit: true,
-    toolType: '汇总',
+    cellEdit: 1,
+    promoType: '汇总',
     dataType: 'UV价值',
     _12Month1day: '290.00',
     _12Month2day: '200,376.00',
@@ -101,8 +101,8 @@ export const tableData = [
     monthCompare: '75.99%'
   }, {
     promoID: '789',
-    cellEdit: true,
-    toolType: '品销宝',
+    cellEdit: 1,
+    promoType: '品销宝',
     dataType: '店铺总点击（生意参谋）',
     _12Month1day: '279.00',
     _12Month2day: '200,376.00',
@@ -118,8 +118,8 @@ export const tableData = [
   },
   {
     promoID: '789',
-    cellEdit: true,
-    toolType: '品销宝',
+    cellEdit: 1,
+    promoType: '品销宝',
     dataType: '付款笔数',
     _12Month1day: '568.00',
     _12Month2day: '200,376.00',
@@ -135,8 +135,8 @@ export const tableData = [
   },
   {
     promoID: '101112',
-    cellEdit: true,
-    toolType: '品牌特秀',
+    cellEdit: 1,
+    promoType: '品牌特秀',
     dataType: '店铺总点击（生意参谋）',
     _12Month1day: '459.00',
     _12Month2day: '200,376.00',
@@ -151,8 +151,8 @@ export const tableData = [
     monthCompare: '75.99%'
   }, {
     promoID: '101112',
-    cellEdit: true,
-    toolType: '品牌特秀',
+    cellEdit: 1,
+    promoType: '品牌特秀',
     dataType: '付款笔数',
     _12Month1day: '9065.00',
     _12Month2day: '200,376.00',
@@ -167,8 +167,8 @@ export const tableData = [
     monthCompare: '75.99%'
   }, {
     promoID: '131415',
-    cellEdit: false,
-    toolType: '品牌专区',
+    cellEdit: 0,
+    promoType: '品牌专区',
     dataType: 'CPM',
     _12Month1day: '33.8%',
     _12Month2day: '100',
@@ -182,8 +182,8 @@ export const tableData = [
     monthCompare: '75.99%'
   }, {
     promoID: '131415',
-    cellEdit: false,
-    toolType: '品牌专区',
+    cellEdit: 0,
+    promoType: '品牌专区',
     dataType: '点击率',
     _12Month1day: '34%',
     _12Month2day: '100',
@@ -197,8 +197,8 @@ export const tableData = [
     monthCompare: '75.99%'
   }, {
     promoID: '161718',
-    cellEdit: false,
-    toolType: '直通车',
+    cellEdit: 0,
+    promoType: '直通车',
     dataType: '加购成本',
     _12Month1day: '34%',
     _12Month2day: '100',
@@ -212,8 +212,8 @@ export const tableData = [
     monthCompare: '75.99%'
   }, {
     promoID: '161718',
-    cellEdit: false,
-    toolType: '直通车',
+    cellEdit: 0,
+    promoType: '直通车',
     dataType: '客单价',
     _12Month1day: '34%',
     _12Month2day: '100',
@@ -227,8 +227,8 @@ export const tableData = [
     monthCompare: '75.99%'
   }, {
     promoID: '161718',
-    cellEdit: false,
-    toolType: '直通车',
+    cellEdit: 0,
+    promoType: '直通车',
     dataType: 'ROI',
     _12Month1day: '34%',
     _12Month2day: '100',

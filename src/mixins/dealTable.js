@@ -127,7 +127,7 @@ const mixins = {
     },
     // 格式化月份时间
     fromatMonth () {
-      monthSpliceDay(this.searchForm.month)
+      return monthSpliceDay(this.searchForm.month)
     },
     resetForm (formName) {
       this.timeSection = []
