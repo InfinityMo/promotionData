@@ -6,7 +6,7 @@
                 :span-method="rowMerge"
                 :key="tableKey"
                 border
-                :height="calcHeight">
+                :max-height="calcHeight">
         <el-table-column v-for="(cloumn,index) in columns"
                          :fixed="cloumn.isFixed"
                          :width="cloumn.width"
@@ -126,7 +126,14 @@ export default {
             if (i.key === 'yearCompare' || i.key === 'monthCompare') {
               i.width = '92'
             } else {
-              i.width = '153'
+              const clientHeight = document.documentElement.clientWidth || document.body.clientWidth
+              if (clientHeight < 1920) {
+                i.width = '153'
+              } else {
+                if (this.columns.length > 11) {
+                  i.width = '153'
+                }
+              }
             }
             i.align = 'right'
             i.isFixed = false
@@ -204,7 +211,15 @@ export default {
         Object.keys(copyEdittable).map(key => {
           submitArr.push(copyEdittable[key])
         })
-        console.log(submitArr)
+        this.$request.post('/edit', {
+          shop: this.form.shop,
+          dataJson: JSON.stringify(submitArr)
+        }).then(res => {
+          if (res.errorCode === 1) {
+            this.$message.success('保存成功')
+            this.getTableData()
+          }
+        })
       }
     },
     viewMonthData (columnKey) {

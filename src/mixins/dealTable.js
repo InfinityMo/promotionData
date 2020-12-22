@@ -107,9 +107,20 @@ const mixins = {
         case 1:
           this.timeSection = getLastSevenDay()
           break
+
         // 上周
         case 2:
           this.timeSection = prevWeek()
+          break
+        // 默认为当月
+        case 3:
+          // eslint-disable-next-line no-case-declarations
+          const nowDate = new Date()
+          // eslint-disable-next-line no-case-declarations
+          const year = nowDate.getFullYear()
+          // eslint-disable-next-line no-case-declarations
+          const month = nowDate.getMonth() + 1 > 10 ? nowDate.getMonth() + 1 : '0' + (nowDate.getMonth() + 1)
+          this.searchForm.month = `${year}-${month}`
           break
         // 最近三十天
         case 4:
