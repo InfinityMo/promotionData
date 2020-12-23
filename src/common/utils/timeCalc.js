@@ -80,13 +80,13 @@ export function prevYear () {
 export function monthSpliceDay (monthYear) {
   // 当前月份
   var currentDate = new Date()
-  var nowMonth = currentDate.getMonth() + 1 > 10 ? currentDate.getMonth() + 1 : `0${currentDate.getMonth() + 1}`
+  var nowMonth = currentDate.getMonth() + 1 >= 10 ? currentDate.getMonth() + 1 : `0${currentDate.getMonth() + 1}`
   // 当前日期的前一天
   var prevOneDate = new Date().getDate() - 1
   // 指定日期
   var pointDate = new Date(monthYear)
   var pointYear = pointDate.getFullYear()
-  var pointMonth = pointDate.getMonth() + 1 > 10 ? pointDate.getMonth() + 1 : `0${pointDate.getMonth() + 1}`
+  var pointMonth = pointDate.getMonth() + 1 >= 10 ? pointDate.getMonth() + 1 : `0${pointDate.getMonth() + 1}`
   // 指定月份的最后一天
   var pointMonthLastDay = new Date(pointYear, pointMonth, 0).getDate()
   if (nowMonth === pointMonth) {

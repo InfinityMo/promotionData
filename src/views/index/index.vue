@@ -113,11 +113,19 @@
                             placement="top">
                   <i class="down-template"></i>
                 </el-tooltip>
-                <span class="down-text">下载表格模板</span>
+                <span class="down-text"
+                      @click="downMold">下载表格模板</span>
               </el-link>
-              <el-button plain
-                         class="import-btn"><i class="import-icon"></i>导入数据</el-button>
-              <el-button type="primary"><i class="export-icon"></i>下载报表</el-button>
+              <el-upload accept=".xlsx,.xls"
+                         action=""
+                         :before-upload="beforeUpload"
+                         :file-list="fileList"
+                         :show-file-list="false">
+                <el-button plain
+                           class="import-btn"><i class="import-icon"></i>导入数据</el-button>
+              </el-upload>
+              <el-button type="primary"
+                         @click="downTable"><i class="export-icon"></i>下载报表</el-button>
             </div>
           </div>
           <!-- table -->
@@ -142,6 +150,7 @@
   </div>
 </template>
 <script>
+import axios from 'axios'
 import tableMixin from '@/mixins/dealTable'
 import HeaderTop from '@/components/header'
 import { scrollTo } from '@/common/utils/funcStore'
@@ -180,7 +189,9 @@ export default {
       monthDataShow: false,
       randomKey: 1,
       isShowTable: false,
-      searchClick: false
+      searchClick: false,
+      fileList: [],
+      fileType: ['xlsx', 'xls']
     }
   },
   watch: {
@@ -243,6 +254,73 @@ export default {
     openMonthDialog (columnKey) {
       this.monthForm = { ...this.submitForm }
       this.monthDataShow = true
+    },
+    beforeUpload (file) {
+      const { name } = file
+      if (!this.fileType.includes(name.split('.')[name.split.length - 1])) {
+        this.$message.warning('文件格式不正确，请检查文件')
+        return false
+      }
+      const fileSize = file.size / 1024 / 1024
+      if (fileSize > 5) {
+        this.$message.warning('文件上传过大,请检查文件')
+        return false
+      }
+      this.fileList = [...this.fileList, file]
+      this.uploadHandel()
+    },
+    // 下载模板
+    downMold () {
+      const src = `${process.env.VUE_APP_API}/mold`
+      location.href = src
+    },
+    // 下载报表
+    downTable () {
+      const dataTypeArr = []
+      this.searchForm.dataType.map(i => {
+        dataTypeArr.push(i[1] || '')
+      })
+      const downForm = Object.assign({}, {
+        timeType: this.searchForm.timeType,
+        startDate: this.timeSection[0] || this.fromatMonth()[0],
+        endDate: this.timeSection[1] || this.fromatMonth()[1],
+        shop: this.searchForm.shop,
+        dataType: dataTypeArr.join() || ''
+      })
+      console.log(downForm)
+      const src = `${process.env.VUE_APP_API}/export?timeType=${downForm.timeType}&startDate=${downForm.startDate}&endDate=${downForm.endDate}&shop=${downForm.shop}&dataType=${downForm.dataType}`
+      location.href = src
+    },
+    // 上传
+    uploadHandel () {
+      const { fileList } = this
+      const formData = new FormData()
+      fileList.forEach(file => {
+        formData.append('file', file)
+      })
+      const submitUrl = `${process.env.VUE_APP_API}/import`
+      this.$store.commit('SETSPINNING', true)
+      axios.request({
+        url: submitUrl,
+        method: 'post',
+        data: formData,
+        timeout: 100000,
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }).then(res => {
+        this.$store.commit('SETSPINNING', false)
+        if (res.data.errorCode === 1) {
+          this.$message.success('文件导入成功')
+        } else if (res.data.errorCode === 103) {
+          this.$message.error('文件名称不正确，请检查文件')
+        } else if (res.data.errorCode === 104) {
+          this.$message.error('文件内容不正确，请检查文件')
+        }
+      }).catch(res => {
+        this.$store.commit('SETSPINNING', false)
+        this.$message.error('文件上传失败')
+      })
     }
   }
 }

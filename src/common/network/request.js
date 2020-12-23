@@ -68,13 +68,16 @@ instance.interceptors.request.use(
 // 添加响应拦截器
 instance.interceptors.response.use(response => {
   store.commit('SETSPINNING', false)
-  // errorCode为1时，请求成功，其余状态皆为失败
+  // errorCode为1时，请求成功
   if (response.data.errorCode === 1) {
     // removePending(response.config) // 在一个ajax响应后再执行一下取消操作，把已经完成的请求从pending中移除
     return response.data // 过滤响应对象里多余的字段，只返回需要的data
-  } else {
+  } else if (response.data.errorCode === -1) {
+    // errorCode为-1时，请求失败，为服务器问题
     Message.error(codeMessage['500'])
     return Promise.reject(response.data.errorMsg)
+  } else {
+    return Promise.reject(response.data)
   }
 }, error => {
   store.commit('SETSPINNING', false)

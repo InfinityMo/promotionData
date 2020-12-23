@@ -38,10 +38,14 @@
               <el-form-item :prop="cloumn.key+scope.$index+'.updateData'"
                             class="table-input"
                             :rules="[{ required: true, message: '请输入', trigger: 'blur' },
-                            { pattern: /^\d+(\.\d{0,3})?$/, message: '请输入正确的数字', trigger: 'blur' },
-                            {max: 14 , message: '最大长度14位', trigger: 'blur' }]">
-                <el-input placeholder="请输入"
-                          v-model="editTable[cloumn.key+scope.$index].updateData"></el-input>
+                            { pattern: /^\d+(\.\d{0,2})?$/, message: '请输入正确的数字', trigger: 'blur' },
+                            {max: 13 , message: '最大长度13位', trigger: 'blur' }]">
+                <div class="input-wrap">
+                  <el-input placeholder="请输入"
+                            :class="{'input-indent':scope.row.dataID === 3}"
+                            v-model="editTable[cloumn.key+scope.$index].updateData"></el-input>
+                  <span v-if="scope.row.dataID === 3">%</span>
+                </div>
               </el-form-item>
             </div>
             <div v-else
@@ -180,6 +184,7 @@ export default {
             if (item.promoID === 1 && item.dataID === 3) {
               // 缓存当前列可编辑的数据
               cacheArr.push({
+                dataID: item.dataID,
                 cacheKey: columnKey + index,
                 updateData: item[columnKey]
               })
@@ -187,12 +192,14 @@ export default {
                 updateDate: columnKey,
                 updateShop: '',
                 promoID: item.promoID,
+                dataID: item.dataID,
                 dataType: item.dataType,
                 updateData: item[columnKey]
               })
             } else {
               // 缓存当前列可编辑的数据
               cacheArr.push({
+                dataID: item.dataID,
                 cacheKey: columnKey + index,
                 updateData: isNaN(String(parseInt(item[columnKey].replace(/,/g, '')))) ? '0' : String(parseInt(item[columnKey].replace(/,/g, '')))
               })
@@ -200,6 +207,7 @@ export default {
                 updateDate: columnKey,
                 updateShop: '',
                 promoID: item.promoID,
+                dataID: item.dataID,
                 dataType: item.dataType,
                 updateData: isNaN(String(parseInt(item[columnKey].replace(/,/g, '')))) ? '0' : String(parseInt(item[columnKey].replace(/,/g, '')))
               })
@@ -213,6 +221,7 @@ export default {
     },
     submitData () {
       const copyEdittable = JSON.parse(JSON.stringify(this.editTable))
+      // 如果缓存的当前列为空，则当前整列为不可编辑。
       if (this.getCacheData.length > 0) {
         Object.keys(this.editTable).forEach(eachKey => {
           const target = this.getCacheData.filter(i => i.cacheKey === eachKey)
@@ -226,8 +235,12 @@ export default {
       if (Object.keys(copyEdittable).length > 0) {
         const submitArr = []
         Object.keys(copyEdittable).map(key => {
+          if (copyEdittable[key].dataID === 3) {
+            copyEdittable[key].updateData /= 100
+          }
           submitArr.push(copyEdittable[key])
         })
+
         this.$request.post('/edit', {
           shop: this.form.shop,
           dataJson: JSON.stringify(submitArr)
@@ -247,21 +260,41 @@ export default {
     viewMonthData (columnKey) {
       this.$emit('monthDialog', columnKey)
     },
-    // tableRowClassName ({ row, rowIndex }) {
-    //   const oldLength = this.filterLength
-    //   const fiterArr = this.promotIdArr.filter(i => i === row.promoID)
-    //   this.filterLength = fiterArr.length
-    //   if (fiterArr.length >= 0) {
-    //     debugger
-    //     if (rowIndex <= fiterArr.length + oldLength) {
-    //       return 'column-stripe'
-    //     } else {
-    //       return 'column-normal'
-    //     }
-    //   } else {
-    //     return ''
-    //   }
-    // },
+    tableRowClassName ({ row, rowIndex }) {
+      const newArr = this.formatRowspanAndColspan(this.tableData, 'promoID')
+      console.log(newArr)
+      // const indexArr = newArr.filter(item => item.num > 0)
+      const indexArr = []
+      newArr.map(i => {
+        if (i.num > 0) {
+          indexArr.push(i.num)
+        }
+      })
+      const datalength = indexArr.reduce((prev, cur) => {
+        return prev + cur
+      }, 0)
+      for (let i = 0; i < datalength; i++) {
+        // if(rowIndex<)
+      }
+      // console.log(indexArr)
+      // indexArr.reduce((prev, cur) => {
+      //   console.log(cur.num)
+      //   return prev + cur.num
+      // }, 0)
+      // const oldLength = this.filterLength
+      // const fiterArr = this.promotIdArr.filter(i => i === row.promoID)
+      // this.filterLength = fiterArr.length
+      // if (fiterArr.length >= 0) {
+      //   debugger
+      //   if (rowIndex <= fiterArr.length + oldLength) {
+      //     return 'column-stripe'
+      //   } else {
+      //     return 'column-normal'
+      //   }
+      // } else {
+      //   return ''
+      // }
+    },
     // 合并行
 
     formatRowspanAndColspan (tableData, tableKey) {
@@ -300,6 +333,7 @@ export default {
     rowMerge ({ row, column, rowIndex, columnIndex }) {
       // 合并第一列
       const newArr = this.formatRowspanAndColspan(this.tableData, 'promoID')
+
       if (columnIndex === 0) {
         const num = newArr[rowIndex].num
         if (num > 1) {

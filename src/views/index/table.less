@@ -31,6 +31,24 @@
 
   .has-input {
     padding-top: 5px;
+
+
+    .input-wrap {
+      position: relative;
+
+      .input-indent {
+        /deep/ .el-input__inner {
+          padding-right: 30px;
+        }
+      }
+
+      span {
+        position: absolute;
+
+        right: 15px;
+
+      }
+    }
   }
 
   .column-stripe {
