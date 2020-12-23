@@ -40,12 +40,14 @@ export default new Vuex.Store({
 
         // })
         commit('SAVEUSERINFO', {
-          userName: 'TL-0001',
+          userID: 'TL-0001',
+          userName: 'TEST',
           userImg: 'https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=1694681277,1453280371&fm=26&gp=0.jpg',
           userId: 'rewr31254fadsagrssda'
         })
         sessionStorage.setItem('userData', JSON.stringify({
-          userName: 'TL-0001',
+          userID: 'TL-0001',
+          userName: 'TEST',
           userImg: 'https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=1694681277,1453280371&fm=26&gp=0.jpg',
           userId: 'rewr31254fadsagrssda'
         }))

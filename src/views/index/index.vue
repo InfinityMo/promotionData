@@ -140,17 +140,19 @@
                width="1000px"
                top="40px"
                :modal="true"
-               :destroy-on-close="true"
+               v-if="monthDataShow"
                :visible.sync="monthDataShow">
       <div slot="title">
         <span>{{timeTypeSelect}}</span><em v-show="timeTypeSelect!==''&&shopSelect!==''">，</em><span>{{shopSelect}}</span>
       </div>
-      <Table :form="monthForm" />
+      <Table :form="monthForm"
+             @tableRender="dialogTableRender" />
     </el-dialog>
   </div>
 </template>
 <script>
 import axios from 'axios'
+import { mapGetters } from 'vuex'
 import tableMixin from '@/mixins/dealTable'
 import HeaderTop from '@/components/header'
 import { scrollTo } from '@/common/utils/funcStore'
@@ -197,14 +199,17 @@ export default {
   watch: {
 
   },
+  computed: {
+    ...mapGetters({ userData: 'getUserData' })
+  },
   created () {
     this.getSelectData()
     this.timeTypeChange(1)
   },
   mounted () {
-    //
+    // 创建水印
     this.$nextTick(() => {
-      watermark.set('TL-1563-Infinity')
+      watermark.set(`${this.userData.userID}——${this.userData.userName}`)
     })
   },
   methods: {
@@ -228,10 +233,6 @@ export default {
       })
     },
     searchHandle () {
-      // if (this.searchForm.month) {
-      //   this.fromatMonth()
-      //   console.log(this.fromatMonth())
-      // }
       this.searchClick = true
       const dataTypeArr = []
       this.searchForm.dataType.map(i => {
@@ -246,9 +247,21 @@ export default {
       })
       // 向下滚动到表格区域
     },
-    tableRender () {
-      if (this.searchClick) {
-        scrollTo(135)
+    tableRender (flag) {
+      this.$nextTick(() => {
+        this.$store.commit('SETSPINNING', false)
+      })
+      if (this.searchClick && flag) {
+        setTimeout(() => {
+          scrollTo(135)
+        }, 500)
+      }
+    },
+    dialogTableRender (flag) {
+      if (flag) {
+        this.$nextTick(() => {
+          this.$store.commit('SETSPINNING', false)
+        })
       }
     },
     openMonthDialog (columnKey) {

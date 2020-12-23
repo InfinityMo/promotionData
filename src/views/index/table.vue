@@ -1,6 +1,7 @@
 <template>
   <div>
-    <el-form :model="editTable">
+    <el-form :model="editTable"
+             ref="editTable">
       <el-table :data="tableData"
                 class="custom-table"
                 :span-method="rowMerge"
@@ -12,7 +13,7 @@
                          :width="cloumn.width"
                          :resizable="false"
                          :align="cloumn.align"
-                         :key="cloumn.key"
+                         :key="cloumn.randomKey"
                          :prop="cloumn.key"
                          :label="cloumn.value">
           <!-- 插槽-自定义表头 -->
@@ -58,8 +59,6 @@
 </template>
 <script>
 
-// import { tableData } from './tableData'
-// import { column } from './column'
 import { createUUID } from '@/common/utils/funcStore'
 import { mapMutations, mapGetters } from 'vuex'
 export default {
@@ -72,6 +71,7 @@ export default {
   data () {
     return {
       columns: [],
+      columnKeyArr: [], // 当前column的所有集合
       tableData: [],
       editTable: {},
       promotIdArr: [],
@@ -83,8 +83,11 @@ export default {
   watch: {
     form: {
       handler (val, oldval) {
-        this.getColumns()
-        this.getTableData()
+        this.getColumns().then(res => {
+          if (res) {
+            this.getTableData()
+          }
+        })
         // 判断表格数据为月份
         this.isViewMonth = !!(val.timeType === 5 || val.timeType === 6)
       },
@@ -103,109 +106,117 @@ export default {
     }
   },
   created () {
-    // console.log(this.form)
-    this.getColumns()
-    this.getTableData()
+    this.getColumns().then(res => {
+      if (res) {
+        this.getTableData()
+      }
+    })
   },
   methods: {
     ...mapMutations({ SAVECACHEDATA: 'SAVECACHEDATA' }),
     getColumns () {
       this.columns = []
-      this.$request.post('/getColumn', this.form).then(res => {
-        this.columns = res.data
-        this.columns.forEach(i => {
-          i.randomKey = createUUID()
-          if (i.edit) {
-            i.isEdit = false
-          }
-          if (i.key === 'promoType' || i.key === 'dataType') {
-            i.isFixed = true
-            i.align = 'left'
-            if (i.key === 'promoType') {
-              i.width = '153'
+      this.columnKeyArr = []
+      return new Promise((resolve, reject) => {
+        this.$store.commit('SETSPINNING', true)
+        this.$request.post('/getColumn', this.form, true).then(res => {
+          this.columns = res.data
+          this.columns.forEach(i => {
+            i.randomKey = createUUID()
+            if (i.edit) {
+              i.isEdit = false
+              this.columnKeyArr.push(i.key)
             }
-            if (i.key === 'dataType') {
-              i.width = '196'
-            }
-          } else {
-            if (i.key === 'yearCompare' || i.key === 'monthCompare') {
-              i.width = '92'
-            } else {
-              const clientHeight = document.documentElement.clientWidth || document.body.clientWidth
-              if (clientHeight < 1920) {
+            if (i.key === 'promoType' || i.key === 'dataType') {
+              i.isFixed = true
+              i.align = 'left'
+              if (i.key === 'promoType') {
                 i.width = '153'
+              }
+              if (i.key === 'dataType') {
+                i.width = '196'
+              }
+            } else {
+              if (i.key === 'yearCompare' || i.key === 'monthCompare') {
+                i.width = '92'
               } else {
-                if (this.columns.length > 11) {
+                const clientHeight = document.documentElement.clientWidth || document.body.clientWidth
+                if (clientHeight < 1920) {
                   i.width = '153'
+                } else {
+                  if (this.columns.length > 11) {
+                    i.width = '153'
+                  }
                 }
               }
+              i.align = 'right'
+              i.isFixed = false
             }
-            i.align = 'right'
-            i.isFixed = false
-          }
+          })
+          this.$store.commit('SETSPINNING', false)
+          resolve(true)
         })
       })
     },
     getTableData () {
       this.tableData = []
       this.promotIdArr = []
-      this.tableKey = createUUID()
-      this.$request.post('/getList', this.form).then(res => {
+      this.$store.commit('SETSPINNING', true)
+      this.$request.post('/getList', this.form, true).then(res => {
         this.tableData = res.data || []
         this.tableData.map(i => {
           this.promotIdArr.push(i.promoID)
         })
         // 刷新table dom
-        this.$emit('tableRender', true)
-        // // console.log(this.promotIdArr)
-        // console.log(this.tableKey)
-        // this.$forceUpdate()
+        this.tableKey = createUUID()
+        //  通知父组件表格dom已渲染完成
+        this.$nextTick(() => {
+          this.$emit('tableRender', true)
+        })
       })
     },
     toEdit (index) {
       // 每次编辑一行
-      const columnKeyArr = []
-      this.columns.map((item, index) => {
-        if (item.edit) {
-          this.columns[index].isEdit = false
-          columnKeyArr.push(item.key)
+      const columnsLen = this.columns.length
+      for (let k = 0; k < columnsLen; k++) {
+        if (this.columns[k].edit) {
+          this.columns[k].isEdit = false
         }
-      })
+      }
       const target = this.columns[index]
       target.isEdit = true
       target.randomKey = createUUID()
       this.$set(this.columns, index, target)
-      this.$forceUpdate()
-      if (columnKeyArr.length > 0) {
+      if (this.columnKeyArr.length > 0) {
         const columnKey = target.key
         const cacheArr = []
-        this.tableData.map((item, index) => {
+        const len = this.tableData.length
+        for (let i = 0; i < len; i++) {
+          const item = this.tableData[i]
           if (item.cellEdit) {
             if (item.promoID === 1 && item.dataID === 3) {
               // 缓存当前列可编辑的数据
               cacheArr.push({
                 dataID: item.dataID,
-                cacheKey: columnKey + index,
-                updateData: item[columnKey]
+                cacheKey: columnKey + i,
+                updateData: isNaN(String(Number(item[columnKey].replace(/%/g, '')))) ? '0' : String(Number(item[columnKey].replace(/%/g, '')))
               })
-              this.$set(this.editTable, columnKey + index, {
+              this.$set(this.editTable, columnKey + i, {
                 updateDate: columnKey,
-                updateShop: '',
                 promoID: item.promoID,
                 dataID: item.dataID,
                 dataType: item.dataType,
-                updateData: item[columnKey]
+                updateData: isNaN(String(Number(item[columnKey].replace(/%/g, '')))) ? '0' : String(Number(item[columnKey].replace(/%/g, '')))
               })
             } else {
               // 缓存当前列可编辑的数据
               cacheArr.push({
                 dataID: item.dataID,
-                cacheKey: columnKey + index,
+                cacheKey: columnKey + i,
                 updateData: isNaN(String(parseInt(item[columnKey].replace(/,/g, '')))) ? '0' : String(parseInt(item[columnKey].replace(/,/g, '')))
               })
-              this.$set(this.editTable, columnKey + index, {
+              this.$set(this.editTable, columnKey + i, {
                 updateDate: columnKey,
-                updateShop: '',
                 promoID: item.promoID,
                 dataID: item.dataID,
                 dataType: item.dataType,
@@ -213,49 +224,94 @@ export default {
               })
             }
           }
-        })
+        }
+        // this.tableData.forEach((item, index) => {
+
+        // })
+        // this.tableData.forEach((item, index) => {
+        //   if (item.cellEdit) {
+        //     if (item.promoID === 1 && item.dataID === 3) {
+        //       // 缓存当前列可编辑的数据
+        //       cacheArr.push({
+        //         dataID: item.dataID,
+        //         cacheKey: columnKey + index,
+        //         updateData: isNaN(String(Number(item[columnKey].replace(/%/g, '')))) ? '0' : String(Number(item[columnKey].replace(/%/g, '')))
+        //       })
+        //       this.$set(this.editTable, columnKey + index, {
+        //         updateDate: columnKey,
+        //         updateShop: '',
+        //         promoID: item.promoID,
+        //         dataID: item.dataID,
+        //         dataType: item.dataType,
+        //         updateData: isNaN(String(Number(item[columnKey].replace(/%/g, '')))) ? '0' : String(Number(item[columnKey].replace(/%/g, '')))
+        //       })
+        //     } else {
+        //       // 缓存当前列可编辑的数据
+        //       cacheArr.push({
+        //         dataID: item.dataID,
+        //         cacheKey: columnKey + index,
+        //         updateData: isNaN(String(parseInt(item[columnKey].replace(/,/g, '')))) ? '0' : String(parseInt(item[columnKey].replace(/,/g, '')))
+        //       })
+        //       this.$set(this.editTable, columnKey + index, {
+        //         updateDate: columnKey,
+        //         updateShop: '',
+        //         promoID: item.promoID,
+        //         dataID: item.dataID,
+        //         dataType: item.dataType,
+        //         updateData: isNaN(String(parseInt(item[columnKey].replace(/,/g, '')))) ? '0' : String(parseInt(item[columnKey].replace(/,/g, '')))
+        //       })
+        //     }
+        //   }
+        // })
         this.SAVECACHEDATA(cacheArr)
       }
       // 刷新table dom
-      this.tableKey = createUUID()
+      // this.tableKey = createUUID()
     },
     submitData () {
-      const copyEdittable = JSON.parse(JSON.stringify(this.editTable))
-      // 如果缓存的当前列为空，则当前整列为不可编辑。
-      if (this.getCacheData.length > 0) {
-        Object.keys(this.editTable).forEach(eachKey => {
-          const target = this.getCacheData.filter(i => i.cacheKey === eachKey)
-          if (target.length > 0) {
-            if (this.editTable[eachKey].updateData === target[0].updateData) {
-              delete copyEdittable[eachKey]
-            }
+      this.$refs.editTable.validate((valid) => {
+        if (valid) {
+          const copyEdittable = JSON.parse(JSON.stringify(this.editTable))
+          // 如果缓存的当前列为空，则当前整列为不可编辑。
+          if (this.getCacheData.length > 0) {
+            Object.keys(this.editTable).forEach(eachKey => {
+              const target = this.getCacheData.filter(i => i.cacheKey === eachKey)
+              if (target.length > 0) {
+                if (this.editTable[eachKey].updateData === target[0].updateData) {
+                  delete copyEdittable[eachKey]
+                }
+              }
+            })
           }
-        })
-      }
-      if (Object.keys(copyEdittable).length > 0) {
-        const submitArr = []
-        Object.keys(copyEdittable).map(key => {
-          if (copyEdittable[key].dataID === 3) {
-            copyEdittable[key].updateData /= 100
-          }
-          submitArr.push(copyEdittable[key])
-        })
+          if (Object.keys(copyEdittable).length > 0) {
+            const submitArr = []
+            Object.keys(copyEdittable).map(key => {
+              if (copyEdittable[key].dataID === 3) {
+                copyEdittable[key].updateData /= 100
+              }
+              submitArr.push(copyEdittable[key])
+            })
 
-        this.$request.post('/edit', {
-          shop: this.form.shop,
-          dataJson: JSON.stringify(submitArr)
-        }).then(res => {
-          if (res.errorCode === 1) {
-            if (res.data) {
-              this.$message.warning(res.data)
-            } else {
-              this.$message.success('保存成功')
-              this.getColumns()
-              this.getTableData()
-            }
+            this.$request.post('/edit', {
+              shop: this.form.shop,
+              dataJson: JSON.stringify(submitArr)
+            }).then(res => {
+              if (res.errorCode === 1) {
+                if (res.data) {
+                  this.$message.warning(res.data)
+                } else {
+                  this.$message.success('保存成功')
+                  this.getColumns()
+                  this.getTableData()
+                }
+              }
+            })
           }
-        })
-      }
+        } else {
+          this.$message.warning('输入有误，请核查数据')
+          return false
+        }
+      })
     },
     viewMonthData (columnKey) {
       this.$emit('monthDialog', columnKey)

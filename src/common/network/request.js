@@ -35,6 +35,8 @@ const codeMessage = {
   503: '服务不可用，服务器暂时过载或维护',
   504: '网关超时'
 }
+// 是否直接在请求成功里去除loding
+let isLoadingFlag = true
 // 解决快速点击或并发请求出现的多个请求的问题
 const pending = [] // 声明一个数组用于存储每个ajax请求的取消函数和ajax标识
 // eslint-disable-next-line no-unused-vars
@@ -67,7 +69,9 @@ instance.interceptors.request.use(
 )
 // 添加响应拦截器
 instance.interceptors.response.use(response => {
-  store.commit('SETSPINNING', false)
+  if (isLoadingFlag) {
+    store.commit('SETSPINNING', false)
+  }
   // errorCode为1时，请求成功
   if (response.data.errorCode === 1) {
     // removePending(response.config) // 在一个ajax响应后再执行一下取消操作，把已经完成的请求从pending中移除
@@ -111,14 +115,20 @@ export default {
   post (url, params, spinning) {
     trimParams(params)
     if (!spinning) {
+      isLoadingFlag = true
       store.commit('SETSPINNING', true)
+    } else {
+      isLoadingFlag = false
     }
     return instance.post(url, params)
   },
   // get 请求
   get (url, params, spinning) {
     if (!spinning) {
+      isLoadingFlag = true
       store.commit('SETSPINNING', true)
+    } else {
+      isLoadingFlag = false
     }
     return instance.get(url, params)
   },
