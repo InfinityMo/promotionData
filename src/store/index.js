@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import { createUUID } from '@/common/utils/funcStore'
 import axios from '@/common/network/request'
 import { Message } from 'element-ui'
+import createVuexAlong from 'vuex-along'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -10,7 +11,7 @@ export default new Vuex.Store({
     spinning: false, // 加载loading的状态
     cacheData: [], // 当前页面剩余的数据
     userData: {},
-    trackId: createUUID(),
+    trackId: '',
     permissionsCode: '',
     userPower: []
   },
@@ -22,8 +23,8 @@ export default new Vuex.Store({
         state.userData = JSON.parse(sessionStorage.getItem('userData'))
       }
       return state.userData || {}
-    }
-
+    },
+    getUserPower: state => state.userPower
   },
   mutations: {
     // 突变配置加载loading的状态
@@ -42,11 +43,15 @@ export default new Vuex.Store({
     },
     SAVEUSERPOWER (state, payload) {
       state.userPower = payload
+    },
+    SAVETRACKID (state, payload) {
+      state.trackId = payload
     }
   },
   // 配置异步提交状态
   actions: {
     getUserInfo ({ commit }, form) {
+      commit('SAVETRACKID', createUUID())
       return new Promise((resolve, reject) => {
         axios.post('/login', form).then(res => {
           const { data } = res
@@ -70,5 +75,14 @@ export default new Vuex.Store({
   // 配置store模块
   modules: {
     // menu
-  }
+  },
+  plugins: [
+    createVuexAlong({
+      name: 'promot-vuex-along', // 设置保存的集合名字，避免同站点下的多项目数据冲突
+      local: false,
+      session: {
+        list: ['trackId', 'permissionsCode', 'userPower']
+      }
+    })
+  ]
 })

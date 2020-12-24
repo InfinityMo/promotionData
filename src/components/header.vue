@@ -49,27 +49,27 @@
                :rules="editRules"
                label-width="96px"
                ref="editForm">
-        <el-form-item prop="oldPwd"
+        <el-form-item prop="oripassword"
                       label="旧密码："
                       class="form-item">
           <el-input placeholder="请输入旧密码"
-                    v-model="editForm.oldPwd"
+                    v-model="editForm.oripassword"
                     show-password>
           </el-input>
         </el-form-item>
-        <el-form-item prop="newPwdOne"
+        <el-form-item prop="newpassword"
                       label="新密码："
                       class="form-item">
           <el-input placeholder="请输入新密码"
-                    v-model="editForm.newPwdOne"
+                    v-model="editForm.newpassword"
                     show-password>
           </el-input>
         </el-form-item>
-        <el-form-item prop="newPwdTwo"
+        <el-form-item prop="newpasswordTwo"
                       label="确认新密码："
                       class="form-item">
           <el-input placeholder="请输入确认新密码"
-                    v-model="editForm.newPwdTwo"
+                    v-model="editForm.newpasswordTwo"
                     show-password>
           </el-input>
         </el-form-item>
@@ -87,12 +87,13 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { Base64 } from 'js-base64'
 export default {
   data () {
     var checkPwd = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('请再次输入密码'))
-      } else if (value !== this.editForm.newPwdOne) {
+      } else if (value !== this.editForm.newpassword) {
         callback(new Error('两次输入密码不一致!'))
       } else {
         callback()
@@ -208,20 +209,20 @@ export default {
         newData: '87.00'
       }],
       editForm: {
-        oldPwd: '',
-        newPwdOne: '',
-        newPwdTwo: ''
+        oripassword: '',
+        newpassword: '',
+        newpasswordTwo: ''
       },
       editRules: {
-        oldPwd: [
+        oripassword: [
           { required: true, message: '请输入旧密码', trigger: 'blur' }
         ],
-        newPwdOne: [
+        newpassword: [
           { required: true, message: '请输入新密码', trigger: 'blur' },
           // 密码至少包含 数字和英文，长度6-20
           { pattern: /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$/, message: '密码至少包含数字和英文，长度为6-20个字符', trigger: 'blur' }
         ],
-        newPwdTwo: [
+        newpasswordTwo: [
           { required: true, message: '请输入确认密码', trigger: 'blur' },
           { validator: checkPwd, trigger: 'blur' }
         ]
@@ -250,15 +251,27 @@ export default {
     editHandle () {
       this.$refs.editForm.validate((valid) => {
         if (valid) {
+          const pwdData = {
+            staffId: this.userData.staffId,
+            oripassword: Base64.encode(this.editForm.oripassword),
+            newpassword: Base64.encode(this.editForm.newpassword)
+          }
+          this.$request.post('/changepassword', pwdData).then(res => {
+            if (res.errorCode === 1) {
+              this.$message.success('密码修改成功')
+              sessionStorage.clear()
+              this.$router.push('./')
+            }
+          })
         } else {
           return false
         }
       })
     },
     logout () {
-      // 清除用户session
+      // 跳转登录
+      sessionStorage.clear()
       this.$router.push('./')
-      sessionStorage.removeItem('userData')
     }
   }
 }

@@ -17,18 +17,22 @@
                          :label="cloumn.value">
           <!-- 插槽-自定义表头 -->
           <template v-slot:header>
-            <div class="reset-header flex-item-center flex-between">
-              <span v-if="cloumn.edit">
+            <div class="reset-header"
+                 :class="{'flex-item-center flex-between':userPowerArr.includes(4)&&cloumn.edit}">
+              <span class="flex-item-center"
+                    v-if="userPowerArr.includes(4)&&cloumn.edit&&tableData.length>0">
                 <i class="edit-success-icon"
                    @click="submitData"
                    v-if="cloumn.isEdit"></i>
                 <i class="edit-icon"
                    @click="toEdit(index)"
-                   v-else></i></span>
-              <span v-if="isViewMonth"
-                    @click="viewMonthData(cloumn.key)"
-                    class="view-month">{{cloumn.value}}</span>
-              <span>{{cloumn.value}}</span>
+                   v-else></i>
+              </span>
+              <span @click="viewMonthData(cloumn.key)"
+                    v-if="userPowerArr.includes(4)&&isViewMonth&&cloumn.edit&&tableData.length>0"
+                    :class="{'view-month':userPowerArr.includes(4)&&isViewMonth&&cloumn.edit}">{{cloumn.value}}</span>
+              <span v-else
+                    :class="{'view-month':userPowerArr.includes(4)&&isViewMonth&&cloumn.edit&&tableData.length>0}">{{cloumn.value}}</span>
             </div>
           </template>
           <!-- 插槽-自定义表格 -->
@@ -65,6 +69,10 @@ export default {
     form: {
       type: Object,
       default: () => { }
+    },
+    userPowerArr: {
+      type: Array,
+      default: () => []
     }
   },
   data () {
@@ -76,7 +84,8 @@ export default {
       promotIdArr: [],
       filterLength: 0,
       isViewMonth: false,
-      tableKey: 1
+      tableKey: 1,
+      isShowTable: false
     }
   },
   watch: {
@@ -167,8 +176,6 @@ export default {
           this.promotIdArr.push(i.promoID)
         })
         // 刷新table dom
-        // this.tableKey = createUUID()
-        this.isShowTable = true
         //  通知父组件表格dom已渲染完成
         this.$nextTick(() => {
           this.$emit('tableRender', true)
@@ -186,7 +193,6 @@ export default {
       const target = this.columns[index]
       target.isEdit = true
       console.log(target.key)
-      // target.randomKey = createUUID()
       // this.$set(this.columns, index, target)
       if (this.columnKeyArr.length > 0) {
         const columnKey = target.key
@@ -228,8 +234,6 @@ export default {
         }
         this.SAVECACHEDATA(cacheArr)
       }
-      // 刷新table dom
-      // this.tableKey = createUUID()
     },
     submitData () {
       this.$refs.editTable.validate((valid) => {

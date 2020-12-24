@@ -105,6 +105,7 @@
             <!-- 右侧功能 -->
             <div class="btn-gather">
               <el-link type="primary"
+                       v-if="userPowerArr.includes(3)"
                        class="down-btn flex-item-center"
                        :underline="false">
                 <el-tooltip class="item"
@@ -116,7 +117,8 @@
                 <span class="down-text"
                       @click="downMold">下载表格模板</span>
               </el-link>
-              <el-upload accept=".xlsx,.xls"
+              <el-upload v-if="userPowerArr.includes(3)"
+                         accept=".xlsx,.xls"
                          action=""
                          :before-upload="beforeUpload"
                          :file-list="fileList"
@@ -124,12 +126,14 @@
                 <el-button plain
                            class="import-btn"><i class="import-icon"></i>导入数据</el-button>
               </el-upload>
-              <el-button type="primary"
+              <el-button v-if="userPowerArr.includes(2)"
+                         type="primary"
                          @click="downTable"><i class="export-icon"></i>下载报表</el-button>
             </div>
           </div>
           <!-- table -->
           <Table :form="submitForm"
+                 :userPowerArr="userPowerArr"
                  v-if="isShowTable"
                  @monthDialog="openMonthDialog"
                  @tableRender="tableRender" />
@@ -146,6 +150,7 @@
         <span>{{timeTypeSelect}}</span><em v-show="timeTypeSelect!==''&&shopSelect!==''">，</em><span>{{shopSelect}}</span>
       </div>
       <Table :form="monthForm"
+             :userPowerArr="userPowerArr"
              @tableRender="dialogTableRender" />
     </el-dialog>
   </div>
@@ -164,6 +169,7 @@ export default {
   components: { HeaderTop, Table },
   data () {
     return {
+      // userPowerArr: [],
       searchForm: {
         timeType: 1,
         month: '', // 日期
@@ -200,7 +206,18 @@ export default {
 
   },
   computed: {
-    ...mapGetters({ userData: 'getUserData' })
+    ...mapGetters({
+      userData: 'getUserData',
+      userPower: 'getUserPower'
+    }),
+    userPowerArr () {
+      let userPowerArray = []
+      Object.keys(this.userPower).map(i => {
+        userPowerArray = this.userPower[i]
+      })
+      // userPowerArray = [2, 3, 4]
+      return userPowerArray
+    }
   },
   created () {
     this.getSelectData()
@@ -213,6 +230,11 @@ export default {
     })
   },
   methods: {
+    dealUserPower () {
+      Object.keys(this.userPower).map(i => {
+        this.userPowerArr = this.userPower[i]
+      })
+    },
     getSelectData () {
       Promise.all([this._getSelectData(1), this._getCascader(2)]).then(res => {
         this.shopArr = res[0]
