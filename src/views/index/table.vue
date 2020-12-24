@@ -5,7 +5,6 @@
       <el-table :data="tableData"
                 class="custom-table"
                 :span-method="rowMerge"
-                :key="tableKey"
                 border
                 :max-height="calcHeight">
         <el-table-column v-for="(cloumn,index) in columns"
@@ -13,23 +12,23 @@
                          :width="cloumn.width"
                          :resizable="false"
                          :align="cloumn.align"
-                         :key="cloumn.randomKey"
+                         :key="cloumn.key"
                          :prop="cloumn.key"
                          :label="cloumn.value">
           <!-- 插槽-自定义表头 -->
-          <template #header
-                    v-if="cloumn.edit">
+          <template v-slot:header>
             <div class="reset-header flex-item-center flex-between">
-              <i class="edit-success-icon"
-                 @click="submitData"
-                 v-if="cloumn.isEdit"></i>
-              <i class="edit-icon"
-                 @click="toEdit(index)"
-                 v-else></i>
+              <span v-if="cloumn.edit">
+                <i class="edit-success-icon"
+                   @click="submitData"
+                   v-if="cloumn.isEdit"></i>
+                <i class="edit-icon"
+                   @click="toEdit(index)"
+                   v-else></i></span>
               <span v-if="isViewMonth"
                     @click="viewMonthData(cloumn.key)"
                     class="view-month">{{cloumn.value}}</span>
-              <span v-else>{{cloumn.value}}</span>
+              <span>{{cloumn.value}}</span>
             </div>
           </template>
           <!-- 插槽-自定义表格 -->
@@ -59,7 +58,7 @@
 </template>
 <script>
 
-import { createUUID } from '@/common/utils/funcStore'
+// import { createUUID } from '@/common/utils/funcStore'
 import { mapMutations, mapGetters } from 'vuex'
 export default {
   props: {
@@ -120,11 +119,10 @@ export default {
       return new Promise((resolve, reject) => {
         this.$store.commit('SETSPINNING', true)
         this.$request.post('/getColumn', this.form, true).then(res => {
-          this.columns = res.data
-          this.columns.forEach(i => {
-            i.randomKey = createUUID()
+          const resData = res.data
+          resData.forEach(i => {
+            i.isEdit = false
             if (i.edit) {
-              i.isEdit = false
               this.columnKeyArr.push(i.key)
             }
             if (i.key === 'promoType' || i.key === 'dataType') {
@@ -144,7 +142,7 @@ export default {
                 if (clientHeight < 1920) {
                   i.width = '153'
                 } else {
-                  if (this.columns.length > 11) {
+                  if (resData.length > 11) {
                     i.width = '153'
                   }
                 }
@@ -152,6 +150,7 @@ export default {
               i.align = 'right'
               i.isFixed = false
             }
+            this.columns.push(i)
           })
           this.$store.commit('SETSPINNING', false)
           resolve(true)
@@ -168,7 +167,8 @@ export default {
           this.promotIdArr.push(i.promoID)
         })
         // 刷新table dom
-        this.tableKey = createUUID()
+        // this.tableKey = createUUID()
+        this.isShowTable = true
         //  通知父组件表格dom已渲染完成
         this.$nextTick(() => {
           this.$emit('tableRender', true)
@@ -185,8 +185,9 @@ export default {
       }
       const target = this.columns[index]
       target.isEdit = true
-      target.randomKey = createUUID()
-      this.$set(this.columns, index, target)
+      console.log(target.key)
+      // target.randomKey = createUUID()
+      // this.$set(this.columns, index, target)
       if (this.columnKeyArr.length > 0) {
         const columnKey = target.key
         const cacheArr = []
@@ -225,44 +226,6 @@ export default {
             }
           }
         }
-        // this.tableData.forEach((item, index) => {
-
-        // })
-        // this.tableData.forEach((item, index) => {
-        //   if (item.cellEdit) {
-        //     if (item.promoID === 1 && item.dataID === 3) {
-        //       // 缓存当前列可编辑的数据
-        //       cacheArr.push({
-        //         dataID: item.dataID,
-        //         cacheKey: columnKey + index,
-        //         updateData: isNaN(String(Number(item[columnKey].replace(/%/g, '')))) ? '0' : String(Number(item[columnKey].replace(/%/g, '')))
-        //       })
-        //       this.$set(this.editTable, columnKey + index, {
-        //         updateDate: columnKey,
-        //         updateShop: '',
-        //         promoID: item.promoID,
-        //         dataID: item.dataID,
-        //         dataType: item.dataType,
-        //         updateData: isNaN(String(Number(item[columnKey].replace(/%/g, '')))) ? '0' : String(Number(item[columnKey].replace(/%/g, '')))
-        //       })
-        //     } else {
-        //       // 缓存当前列可编辑的数据
-        //       cacheArr.push({
-        //         dataID: item.dataID,
-        //         cacheKey: columnKey + index,
-        //         updateData: isNaN(String(parseInt(item[columnKey].replace(/,/g, '')))) ? '0' : String(parseInt(item[columnKey].replace(/,/g, '')))
-        //       })
-        //       this.$set(this.editTable, columnKey + index, {
-        //         updateDate: columnKey,
-        //         updateShop: '',
-        //         promoID: item.promoID,
-        //         dataID: item.dataID,
-        //         dataType: item.dataType,
-        //         updateData: isNaN(String(parseInt(item[columnKey].replace(/,/g, '')))) ? '0' : String(parseInt(item[columnKey].replace(/,/g, '')))
-        //       })
-        //     }
-        //   }
-        // })
         this.SAVECACHEDATA(cacheArr)
       }
       // 刷新table dom
@@ -291,7 +254,7 @@ export default {
               }
               submitArr.push(copyEdittable[key])
             })
-
+            console.log(submitArr)
             this.$request.post('/edit', {
               shop: this.form.shop,
               dataJson: JSON.stringify(submitArr)
@@ -322,16 +285,17 @@ export default {
       // const indexArr = newArr.filter(item => item.num > 0)
       const indexArr = []
       newArr.map(i => {
-        if (i.num > 0) {
-          indexArr.push(i.num)
-        }
+        indexArr.push(i.num)
       })
-      const datalength = indexArr.reduce((prev, cur) => {
-        return prev + cur
-      }, 0)
-      for (let i = 0; i < datalength; i++) {
-        // if(rowIndex<)
-      }
+      // const datalength = indexArr.reduce((prev, cur) => {
+      //   return prev + cur
+      // }, 0)
+      // const loop = 0
+      // for (let i = 0; i < datalength; i++) {
+      //   if (rowIndex < datalength[i]) {
+
+      //   }
+      // }
       // console.log(indexArr)
       // indexArr.reduce((prev, cur) => {
       //   console.log(cur.num)

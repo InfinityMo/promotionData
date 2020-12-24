@@ -53,6 +53,9 @@ const removePending = (config) => {
 // 添加请求拦截器
 instance.interceptors.request.use(
   config => {
+    // 服务器全局检索字段
+    config.headers.trackId = store.state.trackId || ''
+    config.headers.permissionsCode = store.state.permissionsCode || ''
     // removePending(config)
     // 添加请求cancel
     // config.cancelToken = new axios.CancelToken((cancel) => {
@@ -73,15 +76,21 @@ instance.interceptors.response.use(response => {
     store.commit('SETSPINNING', false)
   }
   // errorCode为1时，请求成功
-  if (response.data.errorCode === 1) {
-    // removePending(response.config) // 在一个ajax响应后再执行一下取消操作，把已经完成的请求从pending中移除
-    return response.data // 过滤响应对象里多余的字段，只返回需要的data
-  } else if (response.data.errorCode === -1) {
-    // errorCode为-1时，请求失败，为服务器问题
+  // if (response.data.errorCode === 1) {
+  //   // removePending(response.config) // 在一个ajax响应后再执行一下取消操作，把已经完成的请求从pending中移除
+  //   return response.data // 过滤响应对象里多余的字段，只返回需要的data
+  // } else if (response.data.errorCode === -1) {
+  //   // errorCode为-1时，请求失败，为服务器问题
+  //   Message.error(codeMessage['500'])
+  //   return Promise.reject(response.data.errorMsg)
+  // } else {
+  //   return Promise.reject(response.data)
+  // }
+  if (response.data.errorCode === -1) {
     Message.error(codeMessage['500'])
     return Promise.reject(response.data.errorMsg)
   } else {
-    return Promise.reject(response.data)
+    return response.data
   }
 }, error => {
   store.commit('SETSPINNING', false)

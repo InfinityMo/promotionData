@@ -11,18 +11,18 @@
           <el-form :model="loginForm"
                    :rules="loginRules"
                    ref="loginForm">
-            <el-form-item prop="userAccount"
+            <el-form-item prop="staffId"
                           class="form-item">
               <el-input placeholder="请输入用户名"
-                        v-model="loginForm.userAccount">
+                        v-model="loginForm.staffId">
                 <i slot="prefix"
                    class="user-login-userName"></i>
               </el-input>
             </el-form-item>
-            <el-form-item prop="userPassword"
+            <el-form-item prop="password"
                           class="form-item">
               <el-input placeholder="请输入用户密码"
-                        v-model="loginForm.userPassword"
+                        v-model="loginForm.password"
                         show-password>
                 <i slot="prefix"
                    class="user-login-password"></i>
@@ -46,19 +46,19 @@
 </template>
 <script>
 import { mapActions } from 'vuex'
-// import { Base64 } from 'js-base64'
+import { Base64 } from 'js-base64'
 export default {
   data () {
     return {
       loginForm: {
-        userAccount: '',
-        userPassword: ''
+        staffId: '',
+        password: ''
       },
       loginRules: {
-        userAccount: [
+        staffId: [
           { required: true, message: '请输入用户名', trigger: 'blur' }
         ],
-        userPassword: [
+        password: [
           { required: true, message: '请输入密码', trigger: 'blur' }
         ]
       }
@@ -70,8 +70,12 @@ export default {
     ]),
     login () {
       this.$refs.loginForm.validate((valid) => {
+        const loginData = {
+          staffId: this.loginForm.staffId,
+          password: Base64.encode(this.loginForm.password)
+        }
         if (valid) {
-          this.getUserInfo(this.loginForm).then(res => {
+          this.getUserInfo(loginData).then(res => {
             if (res) {
               this.$router.push('./promot')
             }

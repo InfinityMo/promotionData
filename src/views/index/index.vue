@@ -209,7 +209,7 @@ export default {
   mounted () {
     // 创建水印
     this.$nextTick(() => {
-      watermark.set(`${this.userData.userID}——${this.userData.userName}`)
+      watermark.set(`${this.userData.staffId}`)
     })
   },
   methods: {
