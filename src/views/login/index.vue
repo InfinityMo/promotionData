@@ -13,10 +13,13 @@
                    ref="loginForm">
             <el-form-item prop="staffId"
                           class="form-item">
-              <el-input placeholder="请输入用户名"
+              <el-input class="reset-login-user"
+                        placeholder="请输入用户名"
                         v-model="loginForm.staffId">
-                <i slot="prefix"
-                   class="user-login-userName"></i>
+                <span slot="prefix">
+                  <i class="user-login-userName"></i>
+                  <label class="tl">TL -</label>
+                </span>
               </el-input>
             </el-form-item>
             <el-form-item prop="password"
@@ -71,7 +74,7 @@ export default {
     login () {
       this.$refs.loginForm.validate((valid) => {
         const loginData = {
-          staffId: this.loginForm.staffId,
+          staffId: `TL-${this.loginForm.staffId}`,
           password: Base64.encode(this.loginForm.password)
         }
         if (valid) {

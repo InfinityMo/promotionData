@@ -274,7 +274,7 @@ export default {
             })
           }
         } else {
-          this.$message.warning('输入有误，请核查数据')
+          // this.$message.warning('输入有误，请核查数据')
           return false
         }
       })
@@ -282,43 +282,15 @@ export default {
     viewMonthData (columnKey) {
       this.$emit('monthDialog', columnKey)
     },
-    tableRowClassName ({ row, rowIndex }) {
-      const newArr = this.formatRowspanAndColspan(this.tableData, 'promoID')
-      console.log(newArr)
-      // const indexArr = newArr.filter(item => item.num > 0)
-      const indexArr = []
-      newArr.map(i => {
-        indexArr.push(i.num)
-      })
-      console.log(newArr)
-      // const datalength = indexArr.reduce((prev, cur) => {
-      //   return prev + cur
-      // }, 0)
-      // const loop = 0
-      // for (let i = 0; i < datalength; i++) {
-      //   if (rowIndex < datalength[i]) {
-
-      //   }
-      // }
-      // console.log(indexArr)
-      // indexArr.reduce((prev, cur) => {
-      //   console.log(cur.num)
-      //   return prev + cur.num
-      // }, 0)
-      // const oldLength = this.filterLength
-      // const fiterArr = this.promotIdArr.filter(i => i === row.promoID)
-      // this.filterLength = fiterArr.length
-      // if (fiterArr.length >= 0) {
-      //   debugger
-      //   if (rowIndex <= fiterArr.length + oldLength) {
-      //     return 'column-stripe'
-      //   } else {
-      //     return 'column-normal'
-      //   }
-      // } else {
-      //   return ''
-      // }
-    },
+    // tableRowClassName ({ row, rowIndex }) {
+    //   const newArr = this.formatRowspanAndColspan(this.tableData, 'promoID')
+    //   const indexArr = []
+    //   newArr.map(i => {
+    //     if (i.num > 0) {
+    //       indexArr.push(i.num)
+    //     }
+    //   })
+    // },
     // 合并行
 
     formatRowspanAndColspan (tableData, tableKey) {

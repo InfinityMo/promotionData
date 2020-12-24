@@ -105,10 +105,10 @@ export default {
       PAGING: {
         total: 0,
         pageNum: 1,
-        pageSize: 5
+        pageSize: 10
       },
       columns: [{
-        dataKey: 'date',
+        dataKey: 'time',
         title: '日期',
         align: 'left',
         width: 150
@@ -118,7 +118,7 @@ export default {
         align: 'left',
         width: 80
       }, {
-        dataKey: 'eventType',
+        dataKey: 'type',
         title: '操作类型',
         align: 'left',
         width: 80
@@ -127,87 +127,17 @@ export default {
         title: '操作',
         align: 'left'
       }, {
-        dataKey: 'oldData',
+        dataKey: 'old',
         title: '操作前数据',
         align: 'left',
         width: 120
       }, {
-        dataKey: 'newData',
+        dataKey: 'new',
         title: '操作后数据',
         align: 'left',
         width: 120
       }],
-      tableData: [{
-        date: '2020-12-18 19:00',
-        user: 'TL-0001',
-        eventType: '更改',
-        event: '更改 “2020-12-12 品销宝/点击量” 数据',
-        oldData: '20,051,687.00',
-        newData: '90,051,687.00'
-      }, {
-        date: '2020-12-18 19:00',
-        user: 'TL-0001',
-        eventType: '更改',
-        event: '更改',
-        oldData: '687.00',
-        newData: '87.00'
-      }, {
-        date: '2020-12-18 19:00',
-        user: 'TL-0001',
-        eventType: '更改',
-        event: '更改',
-        oldData: '687.00',
-        newData: '87.00'
-      }, {
-        date: '2020-12-18 19:00',
-        user: 'TL-0001',
-        eventType: '更改',
-        event: '更改',
-        oldData: '687.00',
-        newData: '87.00'
-      }, {
-        date: '2020-12-18 19:00',
-        user: 'TL-0001',
-        eventType: '更改',
-        event: '更改',
-        oldData: '687.00',
-        newData: '87.00'
-      }, {
-        date: '2020-12-18 19:00',
-        user: 'TL-0001',
-        eventType: '更改',
-        event: '更改',
-        oldData: '687.00',
-        newData: '87.00'
-      }, {
-        date: '2020-12-18 19:00',
-        user: 'TL-0001',
-        eventType: '更改',
-        event: '更改',
-        oldData: '687.00',
-        newData: '87.00'
-      }, {
-        date: '2020-12-18 19:00',
-        user: 'TL-0001',
-        eventType: '更改',
-        event: '更改',
-        oldData: '687.00',
-        newData: '87.00'
-      }, {
-        date: '2020-12-18 19:00',
-        user: 'TL-0001',
-        eventType: '更改',
-        event: '更改',
-        oldData: '687.00',
-        newData: '87.00'
-      }, {
-        date: '2020-12-18 19:00',
-        user: 'TL-0001',
-        eventType: '更改',
-        event: '更改',
-        oldData: '687.00',
-        newData: '87.00'
-      }],
+      tableData: [],
       editForm: {
         oripassword: '',
         newpassword: '',
@@ -234,7 +164,7 @@ export default {
   },
   methods: {
     viewJournal () {
-      this.journalShow = true
+      this.getTableData()
     },
     editPwd () {
       this.pwdShow = true
@@ -246,7 +176,15 @@ export default {
       this.getTableData()
     },
     getTableData () {
-
+      this.$request.post('/dialog', {
+        pageNum: this.PAGING.pageNum,
+        pageSize: this.PAGING.pageSize
+      }).then(res => {
+        const resData = res.data.result || []
+        this.tableData = resData
+        this.PAGING.total = res.data.total
+        this.journalShow = true
+      })
     },
     editHandle () {
       this.$refs.editForm.validate((valid) => {
