@@ -238,8 +238,8 @@ export default {
     getSelectData () {
       Promise.all([this._getSelectData(1), this._getCascader(2)]).then(res => {
         this.shopArr = res[0]
-        this.searchForm.shop = this.shopArr[2].value
-        this.submitForm.shop = this.shopArr[2].value
+        this.searchForm.shop = this.shopArr[0].value
+        this.submitForm.shop = this.shopArr[0].value
         this.extendOptions = res[1]
         this.extendOptions[0].children.map(i => {
           this.searchForm.dataType.push([this.extendOptions[0].value, i.value])
@@ -322,7 +322,6 @@ export default {
         shop: this.searchForm.shop,
         dataType: dataTypeArr.join() || ''
       })
-      console.log(downForm)
       const src = `${process.env.VUE_APP_API}/export?timeType=${downForm.timeType}&startDate=${downForm.startDate}&endDate=${downForm.endDate}&shop=${downForm.shop}&dataType=${downForm.dataType}`
       location.href = src
     },

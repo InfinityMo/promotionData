@@ -78,7 +78,7 @@ export default new Vuex.Store({
   },
   plugins: [
     createVuexAlong({
-      name: 'promot-vuex-along', // 设置保存的集合名字，避免同站点下的多项目数据冲突
+      name: 'promot',
       local: false,
       session: {
         list: ['trackId', 'permissionsCode', 'userPower']

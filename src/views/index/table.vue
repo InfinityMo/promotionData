@@ -192,11 +192,11 @@ export default {
       }
       const target = this.columns[index]
       target.isEdit = true
-      console.log(target.key)
       // this.$set(this.columns, index, target)
       if (this.columnKeyArr.length > 0) {
         const columnKey = target.key
         const cacheArr = []
+        this.editTable = {}
         const len = this.tableData.length
         for (let i = 0; i < len; i++) {
           const item = this.tableData[i]
@@ -258,7 +258,6 @@ export default {
               }
               submitArr.push(copyEdittable[key])
             })
-            console.log(submitArr)
             this.$request.post('/edit', {
               shop: this.form.shop,
               dataJson: JSON.stringify(submitArr)
@@ -291,6 +290,7 @@ export default {
       newArr.map(i => {
         indexArr.push(i.num)
       })
+      console.log(newArr)
       // const datalength = indexArr.reduce((prev, cur) => {
       //   return prev + cur
       // }, 0)

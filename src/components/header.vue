@@ -12,7 +12,7 @@
                       popper-class="user-popover">
             <div slot="reference">
               <div class="flex-item-center user-info">
-                <div><img :src="userData.userImg"></div>
+                <div><img src="@/assets/img/custom/userImg.png"></div>
                 <p>欢迎您！{{userData.staffId}}</p>
               </div>
             </div>
