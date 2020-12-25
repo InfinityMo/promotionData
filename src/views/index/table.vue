@@ -22,7 +22,7 @@
               <span class="flex-item-center"
                     v-if="userPowerArr.includes(4)&&cloumn.edit&&tableData.length>0">
                 <i class="edit-success-icon"
-                   @click="submitData"
+                   @click="submitData(index)"
                    v-if="cloumn.isEdit"></i>
                 <i class="edit-icon"
                    @click="toEdit(index)"
@@ -235,7 +235,7 @@ export default {
         this.SAVECACHEDATA(cacheArr)
       }
     },
-    submitData () {
+    submitData (editIndexKey) {
       this.$refs.editTable.validate((valid) => {
         if (valid) {
           const copyEdittable = JSON.parse(JSON.stringify(this.editTable))
@@ -272,6 +272,16 @@ export default {
                 }
               }
             })
+          } else {
+            // 不保存取消编辑
+            // const columnsLen = this.columns.length
+            // for (let k = 0; k < columnsLen; k++) {
+            //   if (this.columns[k].edit) {
+            //     this.columns[k].isEdit = false
+            //   }
+            // }
+            const target = this.columns[editIndexKey]
+            target.isEdit = false
           }
         } else {
           // this.$message.warning('输入有误，请核查数据')
