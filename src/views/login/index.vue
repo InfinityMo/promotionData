@@ -14,11 +14,15 @@
             <el-form-item prop="staffId"
                           class="form-item">
               <el-input class="reset-login-user"
+                        :class="{'focus-login-user':tlShow}"
+                        @focus="tlShow=true"
+                        @blur="userNameBlur"
                         placeholder="请输入用户名"
                         v-model="loginForm.staffId">
                 <span slot="prefix">
                   <i class="user-login-userName"></i>
-                  <label class="tl">TL -</label>
+                  <label class="tl"
+                         v-show="tlShow">TL -</label>
                 </span>
               </el-input>
             </el-form-item>
@@ -64,7 +68,8 @@ export default {
         password: [
           { required: true, message: '请输入密码', trigger: 'blur' }
         ]
-      }
+      },
+      tlShow: false
     }
   },
   methods: {
@@ -87,6 +92,10 @@ export default {
           return false
         }
       })
+    },
+    userNameBlur () {
+      this.loginForm.staffId ? this.tlShow = true : this.tlShow = false
+      console.log(this.tlShow)
     }
   }
 }

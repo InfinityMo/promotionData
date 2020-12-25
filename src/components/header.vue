@@ -43,6 +43,7 @@
     <el-dialog title="更改密码"
                custom-class="edit-pwd"
                :visible.sync="pwdShow"
+               :close-on-click-modal="false"
                :destroy-on-close="true"
                width="452px">
       <el-form :model="editForm"

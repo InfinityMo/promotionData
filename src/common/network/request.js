@@ -11,7 +11,7 @@ const { VUE_APP_API } = process.env
 // 创建axios实例，设置超时时间为5S
 const instance = axios.create({
   baseURL: VUE_APP_API,
-  timeout: 7000
+  timeout: 700000
 })
 // instance.defaults.withCredentials = true // 配置跨域，需要跨域时将此配置加上，同时需要后端配合开放跨域
 // 设置post请求默认 Content-Type
@@ -56,6 +56,7 @@ instance.interceptors.request.use(
     // 服务器全局检索字段
     config.headers.trackId = store.state.trackId || ''
     config.headers.permissionsCode = store.state.permissionsCode || ''
+    config.headers.user = store.state.userData.staffId || ''
     // removePending(config)
     // 添加请求cancel
     // config.cancelToken = new axios.CancelToken((cancel) => {

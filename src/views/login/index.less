@@ -52,11 +52,22 @@
       }
 
       .reset-login-user {
-        /deep/ .el-input__inner {
-
+        /deep/ .el-input__inner:focus {
           padding-left: 58px;
         }
 
+        .tl {
+          font-size: 13px;
+          margin-left: 5px;
+          color: #333
+        }
+
+      }
+
+      .focus-login-user {
+        /deep/ .el-input__inner {
+          padding-left: 58px;
+        }
       }
 
       /deep/.el-input__prefix {
@@ -80,11 +91,7 @@
       height: 12px;
     }
 
-    .tl {
-      font-size: 13px;
-      margin-left: 5px;
-      color: #333
-    }
+
 
     .login-btn {
       width: 300px;
