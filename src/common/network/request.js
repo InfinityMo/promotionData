@@ -89,6 +89,7 @@ instance.interceptors.response.use(response => {
   // }
   if (response.data.errorCode === -1) {
     Message.error(codeMessage['500'])
+    store.commit('SETSPINNING', false)
     return Promise.reject(response.data.errorMsg)
   } else {
     return response.data
