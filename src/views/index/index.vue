@@ -314,7 +314,7 @@ export default {
     },
     // 下载模板
     downMold () {
-      const src = `${process.env.VUE_APP_API}/mold?user=${this.userData.staffId}`
+      const src = `${process.env.VUE_APP_API}/mold?user=${this.userData.staffId || ''}&trackId=${this.$store.state.trackId || ''}&permissionsCode=${this.$store.state.permissionsCode || ''}`
       location.href = src
     },
     // 下载报表
@@ -330,7 +330,7 @@ export default {
         shop: this.searchForm.shop,
         dataType: dataTypeArr.join() || ''
       })
-      const src = `${process.env.VUE_APP_API}/export?timeType=${downForm.timeType}&startDate=${downForm.startDate}&endDate=${downForm.endDate}&shop=${downForm.shop}&dataType=${downForm.dataType}&user=${this.userData.staffId}`
+      const src = `${process.env.VUE_APP_API}/export?timeType=${downForm.timeType}&startDate=${downForm.startDate}&endDate=${downForm.endDate}&shop=${downForm.shop}&dataType=${downForm.dataType}&trackId=${this.$store.state.trackId || ''}&permissionsCode=${this.$store.state.permissionsCode || ''}&user=${this.userData.staffId || ''}`
       location.href = src
     },
     // 上传
