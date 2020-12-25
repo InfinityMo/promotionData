@@ -95,7 +95,6 @@ export default {
     },
     userNameBlur () {
       this.loginForm.staffId ? this.tlShow = true : this.tlShow = false
-      console.log(this.tlShow)
     }
   }
 }

@@ -147,7 +147,9 @@
                v-if="monthDataShow"
                :visible.sync="monthDataShow">
       <div slot="title">
-        <span>{{timeTypeSelect}}</span><em v-show="timeTypeSelect!==''&&shopSelect!==''">，</em><span>{{shopSelect}}</span>
+        <span>{{monthDialogTitle}}</span>
+        <em v-show="monthDialogTitle!==''&&shopSelect!==''">，</em>
+        <span>{{shopSelect}}</span>
       </div>
       <Table :form="monthForm"
              :userPowerArr="userPowerArr"
@@ -160,6 +162,7 @@ import axios from 'axios'
 import { mapGetters } from 'vuex'
 import tableMixin from '@/mixins/dealTable'
 import HeaderTop from '@/components/header'
+import { monthSpliceDay } from '@/common/utils/timeCalc'
 import { scrollTo } from '@/common/utils/funcStore'
 import watermark from '@/common/utils/watermark'
 import { timeTypeArr } from './data'
@@ -199,7 +202,8 @@ export default {
       isShowTable: false,
       searchClick: false,
       fileList: [],
-      fileType: ['xlsx', 'xls']
+      fileType: ['xlsx', 'xls'],
+      monthDialogTitle: ''
     }
   },
   watch: {
@@ -286,8 +290,12 @@ export default {
         })
       }
     },
-    openMonthDialog (columnKey) {
-      this.monthForm = { ...this.submitForm }
+    openMonthDialog (columnKey, columnValue) {
+      this.monthDialogTitle = columnValue
+      const monthKey = `${columnKey.substr(1, 4)}-${columnKey.substr(5)}`
+      const startDate = monthSpliceDay(monthKey)[0]
+      const endDate = monthSpliceDay(monthKey)[1]
+      this.monthForm = { ...this.submitForm, timeType: 3, startDate: startDate, endDate: endDate }
       this.monthDataShow = true
     },
     beforeUpload (file) {
@@ -340,20 +348,22 @@ export default {
         data: formData,
         timeout: 100000,
         headers: {
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': 'multipart/form-data',
+          trackId: this.$store.state.trackId || '',
+          permissionsCode: this.$store.state.permissionsCode || '',
+          user: this.$store.state.userData.staffId || ''
         }
       }).then(res => {
         this.$store.commit('SETSPINNING', false)
         if (res.data.errorCode === 1) {
           this.$message.success('文件导入成功')
+        } else if (res.data.errorCode === -1) {
+          this.$message.error('文件上传失败')
         } else if (res.data.errorCode === 103) {
           this.$message.error('文件名称不正确，请检查文件')
         } else if (res.data.errorCode === 104) {
           this.$message.error('文件内容不正确，请检查文件')
         }
-      }).catch(res => {
-        this.$store.commit('SETSPINNING', false)
-        this.$message.error('文件上传失败')
       })
     }
   }

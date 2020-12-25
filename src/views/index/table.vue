@@ -28,7 +28,7 @@
                    @click="toEdit(index)"
                    v-else></i>
               </span>
-              <span @click="viewMonthData(cloumn.key)"
+              <span @click="viewMonthData(cloumn.key,cloumn.value)"
                     v-if="userPowerArr.includes(4)&&isViewMonth&&cloumn.edit&&tableData.length>0"
                     :class="{'view-month':userPowerArr.includes(4)&&isViewMonth&&cloumn.edit}">{{cloumn.value}}</span>
               <span v-else
@@ -279,8 +279,8 @@ export default {
         }
       })
     },
-    viewMonthData (columnKey) {
-      this.$emit('monthDialog', columnKey)
+    viewMonthData (columnKey, columnValue) {
+      this.$emit('monthDialog', columnKey, columnValue)
     },
     // tableRowClassName ({ row, rowIndex }) {
     //   const newArr = this.formatRowspanAndColspan(this.tableData, 'promoID')
