@@ -14,6 +14,8 @@ const instance = axios.create({
   baseURL: VUE_APP_API,
   timeout: 7000
 })
+const CancelToken = axios.CancelToken
+const source = CancelToken.source()
 // instance.defaults.withCredentials = true // 配置跨域，需要跨域时将此配置加上，同时需要后端配合开放跨域
 // 设置post请求默认 Content-Type
 instance.defaults.headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8'
@@ -38,7 +40,7 @@ const codeMessage = {
 }
 // 是否直接在请求成功里去除loding
 let isLoadingFlag = true
-let returnFlag = true
+// const returnFlag = true
 // 解决快速点击或并发请求出现的多个请求的问题
 const pending = [] // 声明一个数组用于存储每个ajax请求的取消函数和ajax标识
 // eslint-disable-next-line no-unused-vars
@@ -55,6 +57,7 @@ const removePending = (config) => {
 // 添加请求拦截器
 instance.interceptors.request.use(
   config => {
+    config.cancelToken = source.token // 全局添加cancelToken
     // 服务器全局检索字段
     config.headers.trackId = store.state.trackId || ''
     config.headers.permissionsCode = store.state.permissionsCode || ''
@@ -95,12 +98,12 @@ instance.interceptors.response.use(response => {
     return Promise.reject(response.data.errorMsg)
   } else if (response.data.errorCode === 1003) {
     store.commit('SETSPINNING', false)
-    if (returnFlag) {
-      returnFlag = false
-      Message.warning('用户身份信息过期，请重新登录')
+    Message.warning('用户身份信息过期，请重新登录')
+    setTimeout(() => {
       sessionStorage.clear()
-      router.push('./')
-    }
+      source.cancel()
+      router.go(0)
+    }, 500)
   } else {
     return response.data
   }
