@@ -13,7 +13,8 @@ export default new Vuex.Store({
     userData: {},
     trackId: '',
     permissionsCode: '',
-    userPower: []
+    userPower: [],
+    shopId: ''
   },
   getters: {
     getCacheData: state => state.cacheData,
@@ -46,6 +47,9 @@ export default new Vuex.Store({
     },
     SAVETRACKID (state, payload) {
       state.trackId = payload
+    },
+    SAVESHOPID (state, payload) {
+      state.shopId = payload
     }
   },
   // 配置异步提交状态

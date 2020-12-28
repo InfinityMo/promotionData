@@ -159,7 +159,7 @@
 </template>
 <script>
 import axios from 'axios'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 import tableMixin from '@/mixins/dealTable'
 import HeaderTop from '@/components/header'
 import { monthSpliceDay } from '@/common/utils/timeCalc'
@@ -207,7 +207,12 @@ export default {
     }
   },
   watch: {
-
+    'searchForm.shop': {
+      deep: true,
+      handler: function (newVal, oldVal) {
+        this.SAVESHOPID(newVal)
+      }
+    }
   },
   computed: {
     ...mapGetters({
@@ -234,6 +239,7 @@ export default {
     })
   },
   methods: {
+    ...mapMutations({ SAVESHOPID: 'SAVESHOPID' }),
     dealUserPower () {
       Object.keys(this.userPower).map(i => {
         this.userPowerArr = this.userPower[i]

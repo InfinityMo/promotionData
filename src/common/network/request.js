@@ -103,7 +103,7 @@ instance.interceptors.response.use(response => {
       sessionStorage.clear()
       source.cancel()
       router.go(0)
-    }, 500)
+    }, 1000)
   } else {
     return response.data
   }

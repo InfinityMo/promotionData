@@ -179,7 +179,8 @@ export default {
     getTableData () {
       this.$request.post('/dialog', {
         pageNum: this.PAGING.pageNum,
-        pageSize: this.PAGING.pageSize
+        pageSize: this.PAGING.pageSize,
+        shop: this.$store.state.shopId || ''
       }).then(res => {
         const resData = res.data.result || []
         this.tableData = resData
