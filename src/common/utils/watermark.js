@@ -11,8 +11,7 @@ const setWatermark = (str) => {
   const can = document.createElement('canvas')
   // 设置画布的长宽
   can.width = 240
-  can.height = 240
-
+  can.height = 200
   const cans = can.getContext('2d')
   // 旋转角度
   cans.rotate(-15 * Math.PI / 180)

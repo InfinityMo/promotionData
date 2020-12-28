@@ -361,6 +361,7 @@ export default {
         }
       }).then(res => {
         this.$store.commit('SETSPINNING', false)
+        this.fileList = []
         if (res.data.errorCode === 1) {
           this.$message.success('文件导入成功')
         } else if (res.data.errorCode === -1) {
@@ -369,6 +370,12 @@ export default {
           this.$message.error('文件名称不正确，请检查文件')
         } else if (res.data.errorCode === 104) {
           this.$message.error('文件内容不正确，请检查文件')
+        } else if (res.data.errorCode === 1003) {
+          this.$message.warning('用户身份信息过期，请重新登录')
+          setTimeout(() => {
+            sessionStorage.clear()
+            this.$router.go(0)
+          }, 1000)
         }
       })
     }

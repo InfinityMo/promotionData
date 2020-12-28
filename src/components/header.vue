@@ -211,7 +211,7 @@ export default {
     logout () {
       // 跳转登录
       sessionStorage.clear()
-      this.$router.push('./')
+      this.$router.go(0)
     }
   }
 }
