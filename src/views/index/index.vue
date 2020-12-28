@@ -276,12 +276,12 @@ export default {
     tableRender (flag) {
       this.$nextTick(() => {
         this.$store.commit('SETSPINNING', false)
+        if (this.searchClick && flag) {
+          setTimeout(() => {
+            scrollTo(135)
+          }, 500)
+        }
       })
-      if (this.searchClick && flag) {
-        setTimeout(() => {
-          scrollTo(135)
-        }, 500)
-      }
     },
     dialogTableRender (flag) {
       if (flag) {

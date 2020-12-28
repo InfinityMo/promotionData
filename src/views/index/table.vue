@@ -145,7 +145,7 @@ export default {
               }
             } else {
               if (i.key === 'yearCompare' || i.key === 'monthCompare') {
-                i.width = '92'
+                i.width = '97'
               } else {
                 const clientHeight = document.documentElement.clientWidth || document.body.clientWidth
                 if (clientHeight < 1920) {
