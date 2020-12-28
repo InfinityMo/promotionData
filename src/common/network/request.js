@@ -5,6 +5,7 @@ Time：2020-07-27
 import axios from 'axios'
 import { stringify } from 'qs'
 import store from '@/store'
+import router from '@/router'
 import { Message } from 'element-ui'
 const { VUE_APP_API } = process.env
 // import router from '@/router'
@@ -91,6 +92,11 @@ instance.interceptors.response.use(response => {
     Message.error(codeMessage['500'])
     store.commit('SETSPINNING', false)
     return Promise.reject(response.data.errorMsg)
+  } else if (response.data.errorCode === 1003) {
+    store.commit('SETSPINNING', false)
+    Message.warning('用户身份信息过期，请重新登录')
+    sessionStorage.clear()
+    router.push('./')
   } else {
     return response.data
   }
