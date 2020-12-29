@@ -248,8 +248,8 @@ export default {
     getSelectData () {
       Promise.all([this._getSelectData(1), this._getCascader(2)]).then(res => {
         this.shopArr = res[0]
-        this.searchForm.shop = this.shopArr[0].value
-        this.submitForm.shop = this.shopArr[0].value
+        this.searchForm.shop = this.shopArr[0].value || ''
+        this.submitForm.shop = this.shopArr[0].value || ''
         this.extendOptions = res[1]
         this.extendOptions[0].children.map(i => {
           this.searchForm.dataType.push([this.extendOptions[0].value, i.value])

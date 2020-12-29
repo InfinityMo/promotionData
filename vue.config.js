@@ -18,7 +18,7 @@ module.exports = {
     proxy: {
       [process.env.VUE_APP_API]: {
         // target: 'http://172.165.206.130:8001', // Leone
-        target: 'http://172.165.206.134:8000',
+        target: 'http://promotiondataback.thelian.cn',
         // target: 'http://172.165.211.254:8000',
         pathRewrite: {
           '^/api': ''

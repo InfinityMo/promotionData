@@ -12,7 +12,7 @@ const { VUE_APP_API } = process.env
 // 创建axios实例，设置超时时间为5S
 const instance = axios.create({
   baseURL: VUE_APP_API,
-  timeout: 7000
+  timeout: 20000
 })
 const CancelToken = axios.CancelToken
 const source = CancelToken.source()
