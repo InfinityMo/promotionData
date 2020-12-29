@@ -17,7 +17,7 @@ module.exports = {
     compress: true,
     proxy: {
       [process.env.VUE_APP_API]: {
-        // target: 'http://172.165.210.224:8001', // Leone
+        // target: 'http://172.165.206.130:8001', // Leone
         target: 'http://172.165.206.134:8000',
         // target: 'http://172.165.211.254:8000',
         pathRewrite: {

@@ -30,7 +30,8 @@
                           class="form-item">
               <el-input placeholder="请输入用户密码"
                         v-model="loginForm.password"
-                        show-password>
+                        show-password
+                        @keyup.enter.native="login">
                 <i slot="prefix"
                    class="user-login-password"></i>
               </el-input>
