@@ -7,8 +7,8 @@ import { stringify } from 'qs'
 import store from '@/store'
 import router from '@/router'
 import { Message } from 'element-ui'
+import { customMessage } from '@/common/utils/resetMessage'
 const { VUE_APP_API } = process.env
-// import router from '@/router'
 // 创建axios实例，设置超时时间为5S
 const instance = axios.create({
   baseURL: VUE_APP_API,
@@ -40,7 +40,7 @@ const codeMessage = {
 }
 // 是否直接在请求成功里去除loding
 let isLoadingFlag = true
-let returnFlag = true
+// const returnFlag = true
 // 解决快速点击或并发请求出现的多个请求的问题
 const pending = [] // 声明一个数组用于存储每个ajax请求的取消函数和ajax标识
 // eslint-disable-next-line no-unused-vars
@@ -97,15 +97,17 @@ instance.interceptors.response.use(response => {
     store.commit('SETSPINNING', false)
     return Promise.reject(response.data.errorMsg)
   } else if (response.data.errorCode === 1003) {
-    if (returnFlag) {
-      store.commit('SETSPINNING', false)
-      returnFlag = false
-      Message.warning('用户身份信息过期，请重新登录')
-      sessionStorage.clear()
-      setTimeout(() => {
-        router.go(0)
-      }, 500)
-    }
+    store.commit('SETSPINNING', false)
+    customMessage({ type: 'warning', message: '用户身份信息过期，请重新登录' })
+    // customMessage.warning('')
+    sessionStorage.removeItem('userData')
+    store.dispatch('resetUSerInfo')
+    // 跳转登录
+    sessionStorage.clear()
+    // router.push('./')
+    setTimeout(() => {
+      router.go(0)
+    }, 1500)
   } else {
     return response.data
   }

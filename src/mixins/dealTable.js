@@ -57,14 +57,16 @@ const mixins = {
       const option = []
       return new Promise((resolve, reject) => {
         this.$request.post('/dropdownlist', { dropDownListType: type }).then(res => {
-          const dropData = res.data || []
-          dropData.map((i) => {
-            option.push({
-              value: i.value,
-              label: i.name
+          if (res) {
+            const dropData = res.data || []
+            dropData.map((i) => {
+              option.push({
+                value: i.value,
+                label: i.name
+              })
             })
-          })
-          resolve(option)
+            resolve(option)
+          }
         }).catch(err => {
           reject(err)
         })
@@ -74,15 +76,17 @@ const mixins = {
       const option = []
       return new Promise((resolve, reject) => {
         this.$request.post('/dropdownlist', { dropDownListType: type }).then(res => {
-          const dropData = res.data || []
-          dropData.map((i) => {
-            option.push({
-              value: i.value,
-              label: i.name,
-              children: i.children && i.children.length > 0 ? this._setChild(i.children) : []
+          if (res) {
+            const dropData = res.data || []
+            dropData.map((i) => {
+              option.push({
+                value: i.value,
+                label: i.name,
+                children: i.children && i.children.length > 0 ? this._setChild(i.children) : []
+              })
             })
-          })
-          resolve(option)
+            resolve(option)
+          }
         }).catch(err => {
           reject(err)
         })

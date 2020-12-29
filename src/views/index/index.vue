@@ -373,9 +373,14 @@ export default {
         } else if (res.data.errorCode === 1003) {
           this.$message.warning('用户身份信息过期，请重新登录')
           setTimeout(() => {
+            sessionStorage.removeItem('userData')
+            this.$store.dispatch('resetUSerInfo')
+            // 跳转登录
             sessionStorage.clear()
             this.$router.go(0)
-          }, 1000)
+          }, 1500)
+        } else if (res.data.errorCode === 1004) {
+          this.$message.warning('上传权限不足，请联系管理员')
         }
       })
     }

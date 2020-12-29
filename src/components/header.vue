@@ -209,6 +209,8 @@ export default {
       })
     },
     logout () {
+      sessionStorage.removeItem('userData')
+      this.$store.dispatch('resetUSerInfo')
       // 跳转登录
       sessionStorage.clear()
       this.$router.go(0)

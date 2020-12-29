@@ -50,6 +50,14 @@ export default new Vuex.Store({
     },
     SAVESHOPID (state, payload) {
       state.shopId = payload
+    },
+    RESETHEADERDATA (state) {
+      state.trackId = ''
+      state.permissionsCode = ''
+      state.userData = {}
+      state.permissionsCode = ''
+      state.userPower = []
+      state.shopId = ''
     }
   },
   // 配置异步提交状态
@@ -61,6 +69,7 @@ export default new Vuex.Store({
           const { data } = res
           if (res.errorCode === 1) {
             // 将用户信息保存在session中
+            sessionStorage.removeItem('userData')
             sessionStorage.setItem('userData', JSON.stringify({
               staffId: data.userName
             }))
@@ -74,6 +83,10 @@ export default new Vuex.Store({
           }
         })
       })
+    },
+    // 重置vuex
+    resetUSerInfo ({ commit }) {
+      commit('RESETHEADERDATA')
     }
   },
   // 配置store模块

@@ -128,41 +128,43 @@ export default {
       return new Promise((resolve, reject) => {
         this.$store.commit('SETSPINNING', true)
         this.$request.post('/getColumn', this.form, true).then(res => {
-          const resData = res.data
-          resData.forEach(i => {
-            i.isEdit = false
-            if (i.edit) {
-              this.columnKeyArr.push(i.key)
-            }
-            if (i.key === 'promoType' || i.key === 'dataType') {
-              i.isFixed = true
-              i.align = 'left'
-              if (i.key === 'promoType') {
-                i.width = '153'
+          if (res) {
+            const resData = res.data || []
+            resData.forEach(i => {
+              i.isEdit = false
+              if (i.edit) {
+                this.columnKeyArr.push(i.key)
               }
-              if (i.key === 'dataType') {
-                i.width = '196'
-              }
-            } else {
-              if (i.key === 'yearCompare' || i.key === 'monthCompare') {
-                i.width = '97'
-              } else {
-                const clientHeight = document.documentElement.clientWidth || document.body.clientWidth
-                if (clientHeight < 1920) {
+              if (i.key === 'promoType' || i.key === 'dataType') {
+                i.isFixed = true
+                i.align = 'left'
+                if (i.key === 'promoType') {
                   i.width = '153'
+                }
+                if (i.key === 'dataType') {
+                  i.width = '196'
+                }
+              } else {
+                if (i.key === 'yearCompare' || i.key === 'monthCompare') {
+                  i.width = '97'
                 } else {
-                  if (resData.length > 11) {
+                  const clientHeight = document.documentElement.clientWidth || document.body.clientWidth
+                  if (clientHeight < 1920) {
                     i.width = '153'
+                  } else {
+                    if (resData.length > 11) {
+                      i.width = '153'
+                    }
                   }
                 }
+                i.align = 'right'
+                i.isFixed = false
               }
-              i.align = 'right'
-              i.isFixed = false
-            }
-            this.columns.push(i)
-          })
-          this.$store.commit('SETSPINNING', false)
-          resolve(true)
+              this.columns.push(i)
+            })
+            this.$store.commit('SETSPINNING', false)
+            resolve(true)
+          }
         })
       })
     },
