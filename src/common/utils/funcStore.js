@@ -30,18 +30,14 @@ export function backTop () {
 export function scrollTo (distance) {
   const timer = setInterval(function () {
     const top = document.body.scrollTop + document.documentElement.scrollTop
-    // console.log(top)
     const speed = Math.floor(distance / 4)
     document.body.scrollTop += speed
     document.documentElement.scrollTop += speed
     // if (document.body.scrollTop !== 0) {
-    //   // debugger
     //   document.body.scrollTop += speed
     // } else {
-    //   // debugger
     //   document.documentElement.scrollTop += speed
     // }
-    // console.log('bot', isScrollToBottom())
     // 垃圾ie
     if (top >= distance - 4 || isScrollToBottom()) {
       clearInterval(timer)
@@ -52,8 +48,6 @@ export function isScrollToBottom () {
   const scrollTop = document.documentElement.scrollTop || document.body.scrollTop
   const clientHeight = document.documentElement.clientHeight || document.body.clientHeight
   const scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight
-  // console.log('scrollTop + clientHeight:', scrollTop + clientHeight)
-  // console.log('scrollHeight:', scrollHeight)
   return scrollTop + clientHeight === scrollHeight
 }
 // 时间格式化
