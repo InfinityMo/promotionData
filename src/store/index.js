@@ -63,13 +63,14 @@ export default new Vuex.Store({
   // 配置异步提交状态
   actions: {
     getUserInfo ({ commit }, form) {
+      sessionStorage.removeItem('userData')
+      commit('RESETHEADERDATA')
       commit('SAVETRACKID', createUUID())
       return new Promise((resolve, reject) => {
         axios.post('/login', form).then(res => {
           const { data } = res
           if (res.errorCode === 1) {
             // 将用户信息保存在session中
-            sessionStorage.removeItem('userData')
             sessionStorage.setItem('userData', JSON.stringify({
               staffId: data.userName
             }))
