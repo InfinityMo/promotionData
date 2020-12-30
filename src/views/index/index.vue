@@ -87,7 +87,8 @@
                 <el-form-item class="search-btn">
                   <!-- <el-button @click="resetForm('searchForm')">重置</el-button> -->
                   <el-button type="primary"
-                             @click="searchHandle">查询</el-button>
+                             @click="searchHandle"
+                             :disabled="searchBtnAbled">查询</el-button>
                 </el-form-item>
               </el-col>
             </el-row>
@@ -98,9 +99,8 @@
           <div class="flex-between-center table-info">
             <div class="flex-item-center">
               <!-- 表格标题 -->
-              <h4>列表</h4>
               <p class="select-tip"
-                 v-show="timeTypeSelect!==''||shopSelect!==''">（<span>{{timeTypeSelect}}</span><em v-show="timeTypeSelect!==''&&shopSelect!==''">，</em><span>{{shopSelect}}</span>）</p>
+                 v-show="timeTypeSelect!==''||shopSelect!==''"><span>{{timeTypeSelect}}</span><em v-show="timeTypeSelect!==''&&shopSelect!==''">，</em><span>{{shopSelect}}</span></p>
             </div>
             <!-- 右侧功能 -->
             <div class="btn-gather">
@@ -203,7 +203,9 @@ export default {
       searchClick: false,
       fileList: [],
       fileType: ['xlsx', 'xls'],
-      monthDialogTitle: ''
+      monthDialogTitle: '',
+      cacheMonth: '',
+      cacheTimeSection: []
     }
   },
   watch: {
@@ -226,6 +228,19 @@ export default {
       })
       // userPowerArray = [2, 3, 4]
       return userPowerArray
+    },
+    searchBtnAbled () {
+      let isAbled = true
+      const judgeForm = {
+        timeType: String(this.searchForm.timeType),
+        time: this.searchForm.timeType === 3 ? this.searchForm.month : this.timeSection, // 日期
+        shop: String(this.searchForm.shop),
+        dataType: this.searchForm.dataType
+      }
+      isAbled = Object.keys(judgeForm).every(item => {
+        return judgeForm[item].length > 0
+      })
+      return !isAbled
     }
   },
   created () {
@@ -265,6 +280,7 @@ export default {
       })
     },
     searchHandle () {
+      //
       this.searchClick = true
       const dataTypeArr = []
       this.searchForm.dataType.map(i => {
@@ -277,7 +293,8 @@ export default {
         shop: this.searchForm.shop,
         dataType: dataTypeArr.join() || ''
       })
-      // 向下滚动到表格区域
+      this.cacheTimeSection = [...this.timeSection]
+      this.cacheMonth = this.searchForm.month || ''
     },
     tableRender (flag) {
       this.$nextTick(() => {
@@ -352,7 +369,7 @@ export default {
         url: submitUrl,
         method: 'post',
         data: formData,
-        timeout: 100000,
+        timeout: 30000,
         headers: {
           'Content-Type': 'multipart/form-data',
           trackId: this.$store.state.trackId || '',
@@ -382,6 +399,9 @@ export default {
         } else if (res.data.errorCode === 1004) {
           this.$message.warning('上传权限不足，请联系管理员')
         }
+      }).catch(res => {
+        this.$message.error('上传失败，请重新上传')
+        this.$store.commit('SETSPINNING', false)
       })
     }
   }
