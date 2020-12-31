@@ -45,6 +45,7 @@
                :visible.sync="pwdShow"
                :close-on-click-modal="false"
                :destroy-on-close="true"
+               @close="editPwdClose"
                width="452px">
       <el-form :model="editForm"
                :rules="editRules"
@@ -169,6 +170,9 @@ export default {
     },
     editPwd () {
       this.pwdShow = true
+    },
+    editPwdClose () {
+      this.$refs.editForm.resetFields()
     },
     // 表格分页的变化
     tableChange (changeParams) {
