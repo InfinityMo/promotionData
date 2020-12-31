@@ -30,6 +30,8 @@
                                 prop="month"
                                 v-show="searchForm.timeType===3">
                     <el-date-picker v-model="searchForm.month"
+                                    :clearable="false"
+                                    :editable="false"
                                     value-format="yyyy-MM"
                                     format="yyyy-MM"
                                     type="month"
@@ -41,6 +43,8 @@
                                 v-show="searchForm.timeType!==3">
                     <el-date-picker v-model="timeSection"
                                     :disabled="timeDisabled"
+                                    :clearable="false"
+                                    :editable="false"
                                     value-format="yyyy-MM-dd"
                                     format="yyyy-MM-dd"
                                     type="daterange"

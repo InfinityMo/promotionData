@@ -150,7 +150,9 @@ export default {
                 } else {
                   const clientHeight = document.documentElement.clientWidth || document.body.clientWidth
                   if (clientHeight < 1920) {
-                    i.width = '153'
+                    if (resData.length > 8) {
+                      i.width = '153'
+                    }
                   } else {
                     if (resData.length > 11) {
                       i.width = '153'
