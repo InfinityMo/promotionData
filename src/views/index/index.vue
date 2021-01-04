@@ -35,7 +35,7 @@
                                     value-format="yyyy-MM"
                                     format="yyyy-MM"
                                     type="month"
-                                    :picker-options="pickerOptions"
+                                    :picker-options="monthPickerOptions"
                                     placeholder="请选择选择月份">
                     </el-date-picker>
                   </el-form-item>

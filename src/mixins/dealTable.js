@@ -22,6 +22,11 @@ const mixins = {
           }
           return time.getTime() > Date.now() - 1 * 24 * 3600 * 1000
         }
+      },
+      monthPickerOptions: {
+        disabledDate: (time) => {
+          return time.getTime() > new Date(`${this.getLastMonth()}-01`).getTime() // 如果现在是12月，则getLastMonth（）为 2020-11，那么十二月不能选，之后年的月份都不可选
+        }
       }
     }
   },
@@ -53,6 +58,17 @@ const mixins = {
 
   },
   methods: {
+    getLastMonth () { // 获取上个月日期 格式 2020-12
+      const date = new Date()
+      let year = date.getFullYear()
+      let month = date.getMonth() + 1
+      if (month === 0) {
+        year = year - 1
+        month = 12
+      }
+      month = month < 10 ? `0${month}` : month
+      return year + '-' + month
+    },
     _getSelectData (type) {
       const option = []
       return new Promise((resolve, reject) => {
