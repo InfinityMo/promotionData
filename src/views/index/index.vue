@@ -44,13 +44,11 @@
                                 v-show="searchForm.timeType!==3">
                     <el-date-picker v-model="timeSection"
                                     :disabled="timeDisabled"
-                                    :clearable="false"
                                     :editable="false"
                                     value-format="yyyy-MM-dd"
                                     format="yyyy-MM-dd"
                                     type="daterange"
                                     align="right"
-                                    unlink-panels
                                     range-separator="~"
                                     :picker-options="pickerOptions"
                                     start-placeholder="开始日期"
@@ -239,7 +237,7 @@ export default {
       let isAbled = true
       const judgeForm = {
         timeType: String(this.searchForm.timeType),
-        time: this.searchForm.timeType === 3 ? this.searchForm.month : this.timeSection, // 日期
+        time: this.searchForm.timeType === 3 ? this.searchForm.month : this.timeSection || [], // 日期
         shop: String(this.searchForm.shop),
         dataType: this.searchForm.dataType
       }

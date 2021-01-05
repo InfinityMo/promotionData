@@ -2,6 +2,7 @@ import { getLastSevenDay, getLastThirtyDay, prevWeek, prevYear, recentYear, mont
 const mixins = {
   data () {
     return {
+      pickerMinDate: '',
       pickerOptions: {
         onPick: ({ maxDate, minDate }) => {
           this.pickerMinDate = minDate.getTime()
