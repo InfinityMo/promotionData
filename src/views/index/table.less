@@ -10,11 +10,11 @@
 
 .el-table {
   /deep/.cell {
-    padding: 0 20px;
+    padding: 0;
   }
 
   /deep/ th {
-    padding: 10px 0;
+    padding: 10px 20px;
     color: #333;
     font-weight: normal;
     background-color: #FAFAFA;
@@ -26,7 +26,11 @@
   }
 
   .normal-cell {
-    padding: 13px 0;
+    padding: 13px 20px;
+  }
+
+  .zebra {
+    background-color: #EAF8F9;
   }
 
   .has-input {
@@ -77,4 +81,8 @@
 .view-month {
   color: #1890FF;
   cursor: pointer;
+}
+
+.fontBold {
+  font-weight: bold;
 }

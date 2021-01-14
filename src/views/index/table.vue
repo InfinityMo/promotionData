@@ -30,9 +30,9 @@
               </span>
               <span @click="viewMonthData(cloumn.key,cloumn.value)"
                     v-if="userPowerArr.includes(4)&&isViewMonth&&cloumn.edit&&tableData.length>0"
-                    :class="{'view-month':userPowerArr.includes(4)&&isViewMonth&&cloumn.edit}">{{cloumn.value}}</span>
+                    :class="{'view-month':userPowerArr.includes(4)&&isViewMonth&&cloumn.edit,'fontBold':cloumn.bold}">{{cloumn.value}}</span>
               <span v-else
-                    :class="{'view-month':userPowerArr.includes(4)&&isViewMonth&&cloumn.edit&&tableData.length>0}">{{cloumn.value}}</span>
+                    :class="{'view-month':userPowerArr.includes(4)&&isViewMonth&&cloumn.edit&&tableData.length>0,'fontBold':cloumn.bold}">{{cloumn.value}}</span>
             </div>
           </template>
           <!-- 插槽-自定义表格 -->
@@ -53,7 +53,8 @@
               </el-form-item>
             </div>
             <div v-else
-                 class="normal-cell">{{scope.row[cloumn.key]}}</div>
+                 class="normal-cell"
+                 :class="{'zebra':cloumn.bold}">{{scope.row[cloumn.key]}}</div>
           </template>
         </el-table-column>
       </el-table>
@@ -150,7 +151,7 @@ export default {
                 }
               } else {
                 if (i.key === 'yearCompare' || i.key === 'monthCompare') {
-                  i.width = '97'
+                  i.width = '110'
                 } else {
                   const clientHeight = document.documentElement.clientWidth || document.body.clientWidth
                   if (clientHeight < 1920) {
