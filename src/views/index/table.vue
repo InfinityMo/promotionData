@@ -29,10 +29,11 @@
                    v-else></i>
               </span>
               <span @click="viewMonthData(cloumn.key,cloumn.value)"
-                    v-if="userPowerArr.includes(4)&&isViewMonth&&cloumn.edit&&tableData.length>0"
-                    :class="{'view-month':userPowerArr.includes(4)&&isViewMonth&&cloumn.edit,'fontBold':cloumn.bold}">{{cloumn.value}}</span>
+                    v-if="isViewMonth&&cloumn.edit&&tableData.length>0"
+                    class="view-month"
+                    :class="{'fontBold':cloumn.bold}">{{cloumn.value}}</span>
               <span v-else
-                    :class="{'view-month':userPowerArr.includes(4)&&isViewMonth&&cloumn.edit&&tableData.length>0,'fontBold':cloumn.bold}">{{cloumn.value}}</span>
+                    :class="{'fontBold':cloumn.bold}">{{cloumn.value}}</span>
             </div>
           </template>
           <!-- 插槽-自定义表格 -->

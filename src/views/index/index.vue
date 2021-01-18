@@ -384,7 +384,21 @@ export default {
         this.$store.commit('SETSPINNING', false)
         this.fileList = []
         if (res.data.errorCode === 1) {
-          this.$message.success('文件导入成功')
+          this.$message.success('导入成功')
+          const msgArr = res.data.data || []
+          if (msgArr && msgArr.length > 0) {
+            let tipMsg = ''
+            msgArr.forEach(i => {
+              tipMsg += `<p><span class="tool">${i.tool}</span><span class="date">${i.date}</span>数据有误</p>`
+            })
+            tipMsg = `<div class="import-tip-content">${tipMsg}</div>`
+            setTimeout(() => {
+              this.$alert(tipMsg, '以下数据有误，未能成功导入', {
+                customClass: 'import-tip',
+                dangerouslyUseHTMLString: true
+              })
+            }, 500)
+          }
         } else if (res.data.errorCode === -1) {
           this.$message.error('文件上传失败')
         } else if (res.data.errorCode === 103) {
