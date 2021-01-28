@@ -1,8 +1,8 @@
 <template>
   <div class="login">
     <div class="login-content flex-center">
-      <img class="left-pic"
-           src="@/assets/img/system/login-bg.png">
+      <!-- <img class="left-pic"
+           src="@/assets/img/system/login-bg.png"> -->
       <div class="login-wrap">
         <div class="title"><img src="@/assets/img/system/title.png"></div>
         <div class="login-form">
@@ -102,4 +102,5 @@ export default {
 </script>
 <style lang="less" scoped>
 @import "./index";
+@import "~@/common/styles/adapt.less";
 </style>

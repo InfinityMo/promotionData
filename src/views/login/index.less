@@ -1,7 +1,10 @@
 .login {
-  width: 100%;
+  position: relative;
   height: 100vh;
-  background: linear-gradient(249.5deg, rgba(43, 184, 189, 0.1) 19.53%, rgba(43, 184, 189, 0) 81.24%);
+  background-image: url(~@/assets/img/system/login-back1.png);
+  background-size: 100% 100%;
+  min-width: 1366px;
+  min-height: 625px;
 }
 
 .login-content {
@@ -12,13 +15,16 @@
   }
 
   .login-wrap {
-    margin-left: 62px;
+    position: absolute;
+    top: 90px;
+    right: 50px;
+    // margin-left: 62px;
 
     .title {
       display: flex;
       justify-content: center;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
     }
   }
 

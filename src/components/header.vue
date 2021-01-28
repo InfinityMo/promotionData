@@ -2,7 +2,7 @@
   <div>
     <div class="head">
       <div class="head-content flex-between-center">
-        <h4>推广工具数据查询系统</h4>
+        <h4>联恩数据营销推广系统</h4>
         <!-- 用户信息 -->
         <div class="flex-item-center user">
           <p class="journal"
