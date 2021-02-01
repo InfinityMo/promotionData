@@ -15,3 +15,4 @@
 [1229/163118.831:ERROR:http_transport_win.cc(276)] WinHttpSendRequest: 操作成功完成。 (0x0)
 [0105/100113.869:ERROR:directory_reader_win.cc(43)] FindFirstFile: 系统找不到指定的路径。 (0x3)
 [0128/094220.806:ERROR:directory_reader_win.cc(43)] FindFirstFile: 系统找不到指定的路径。 (0x3)
+[0128/170803.680:ERROR:file_io.cc(90)] ReadExactly: expected 36, observed 0

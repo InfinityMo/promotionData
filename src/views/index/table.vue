@@ -55,7 +55,18 @@
             </div>
             <div v-else
                  class="normal-cell"
-                 :class="{'zebra':cloumn.bold}">{{scope.row[cloumn.key]}}</div>
+                 :class="{'zebra':cloumn.bold}">
+              <div v-if="scope.row.isWhole===0&&cloumn.key==='sum'">
+                {{scope.row[cloumn.key]}}
+                <el-tooltip class="item"
+                            effect="dark"
+                            content="选取时间范围内有未录入数据"
+                            placement="top">
+                  <i class="data-defect-icon"></i>
+                </el-tooltip>
+              </div>
+              <div v-else>{{scope.row[cloumn.key]}}</div>
+            </div>
           </template>
         </el-table-column>
       </el-table>
