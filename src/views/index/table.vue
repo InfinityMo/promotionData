@@ -73,6 +73,10 @@ export default {
     userPowerArr: {
       type: Array,
       default: () => []
+    },
+    monthDialogBoolean: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -152,10 +156,18 @@ export default {
                   if (clientHeight < 1920) {
                     if (resData.length > 8) {
                       i.width = '153'
+                    } else {
+                      if (this.monthDialogBoolean) {
+                        i.width = '153'
+                      }
                     }
                   } else {
                     if (resData.length > 11) {
                       i.width = '153'
+                    } else {
+                      if (this.monthDialogBoolean) {
+                        i.width = '153'
+                      }
                     }
                   }
                 }

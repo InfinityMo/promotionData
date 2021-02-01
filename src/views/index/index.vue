@@ -156,6 +156,7 @@
         <span>{{shopSelect}}</span>
       </div>
       <Table :form="monthForm"
+             :monthDialogBoolean="true"
              :userPowerArr="userPowerArr"
              @tableRender="dialogTableRender" />
     </el-dialog>
@@ -319,7 +320,7 @@ export default {
     },
     openMonthDialog (columnKey, columnValue) {
       this.monthDialogTitle = columnValue
-      const monthKey = `${columnKey.substr(1, 4)}-${columnKey.substr(5)}`
+      const monthKey = `${columnKey.substr(3, 4)}-${columnKey.substr(7)}`
       const startDate = monthSpliceDay(monthKey)[0]
       const endDate = monthSpliceDay(monthKey)[1]
       this.monthForm = { ...this.submitForm, timeType: 3, startDate: startDate, endDate: endDate }

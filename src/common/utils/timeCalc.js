@@ -80,17 +80,26 @@ export function prevYear () {
 export function monthSpliceDay (monthYear) {
   // 当前月份
   var currentDate = new Date()
+  var currentDay = currentDate.getDate()
+  var nowYear = new Date().getFullYear()
   var nowMonth = currentDate.getMonth() + 1 >= 10 ? currentDate.getMonth() + 1 : `0${currentDate.getMonth() + 1}`
   // 当前日期的前一天
-  var prevOneDate = new Date().getDate() - 1
+  var prevOneDate = new Date(new Date().getTime() - 24 * 60 * 60 * 1000).getDate()
+  if (prevOneDate < 10) {
+    prevOneDate = `0${prevOneDate}`
+  }
   // 指定日期
   var pointDate = new Date(monthYear)
   var pointYear = pointDate.getFullYear()
   var pointMonth = pointDate.getMonth() + 1 >= 10 ? pointDate.getMonth() + 1 : `0${pointDate.getMonth() + 1}`
   // 指定月份的最后一天
   var pointMonthLastDay = new Date(pointYear, pointMonth, 0).getDate()
-  if (nowMonth === pointMonth) {
-    return [`${pointYear}-${pointMonth}-01`, `${pointYear}-${pointMonth}-${prevOneDate}`]
+  if (nowMonth === pointMonth && nowYear === pointYear) {
+    if (currentDay === 1) {
+      return [`${pointYear}-${pointMonth}-01`, `${pointYear}-${pointMonth}-01`]
+    } else {
+      return [`${pointYear}-${pointMonth}-01`, `${pointYear}-${pointMonth}-${prevOneDate}`]
+    }
   } else {
     return [`${pointYear}-${pointMonth}-01`, `${pointYear}-${pointMonth}-${pointMonthLastDay}`]
   }
