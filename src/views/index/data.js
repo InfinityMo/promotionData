@@ -26,6 +26,10 @@ export const timeTypeArr = [
   {
     value: 6,
     label: '去年'
+  },
+  {
+    value: 7,
+    label: '月度范围'
   }
 ]
 

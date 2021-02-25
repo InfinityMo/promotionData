@@ -56,11 +56,11 @@
             <div v-else
                  class="normal-cell"
                  :class="{'zebra':cloumn.bold}">
-              <div v-if="scope.row.isWhole===0&&cloumn.key==='sum'">
+              <div v-if="scope.row.isWhole.includes(cloumn.key)">
                 <el-tooltip class="item"
-                            v-if="scope.row.isWhole===0&&cloumn.key==='sum'"
+                            v-if="scope.row.isWhole.includes(cloumn.key)"
                             effect="dark"
-                            content="选取时间范围内有未录入数据"
+                            content="选取时间范围内有不完整的数据"
                             placement="top">
                   <p>
                     <span>{{scope.row[cloumn.key]}}</span>
@@ -117,7 +117,7 @@ export default {
           }
         })
         // 判断表格数据为月份
-        this.isViewMonth = !!(val.timeType === 5 || val.timeType === 6)
+        this.isViewMonth = !!(val.timeType === 5 || val.timeType === 6 || val.timeType === 7)
       },
       deep: true
     }
@@ -166,7 +166,7 @@ export default {
                 }
               } else {
                 if (i.key === 'yearCompare' || i.key === 'monthCompare') {
-                  i.width = '110'
+                  i.width = '128'
                 } else {
                   const clientHeight = document.documentElement.clientWidth || document.body.clientWidth
                   if (clientHeight < 1920) {
@@ -298,7 +298,7 @@ export default {
                 if (res.data) {
                   this.$message.warning(res.data)
                 } else {
-                  this.$message.success('保存成功')
+                  this.$message.success('保存成功，汇总数据显示可能会有延迟')
                   this.getColumns()
                   this.getTableData()
                 }

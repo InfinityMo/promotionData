@@ -39,9 +39,23 @@
                                     placeholder="请选择选择月份">
                     </el-date-picker>
                   </el-form-item>
+                  <el-form-item label="月度范围："
+                                v-show="searchForm.timeType===7">
+                    <el-date-picker v-model="timeSection"
+                                    :key="monthRangeRadomLey"
+                                    :editable="false"
+                                    value-format="yyyy-MM"
+                                    format="yyyy-MM"
+                                    type="monthrange"
+                                    range-separator="~"
+                                    :picker-options="monthRangePickerOptions"
+                                    start-placeholder="开始月份"
+                                    end-placeholder="结束月份">
+                    </el-date-picker>
+                  </el-form-item>
                   <el-form-item label="日期区间："
                                 class="time-range"
-                                v-show="searchForm.timeType!==3">
+                                v-show="searchForm.timeType!==3&&searchForm.timeType!==7">
                     <el-date-picker v-model="timeSection"
                                     :disabled="timeDisabled"
                                     :editable="false"
@@ -180,6 +194,7 @@ export default {
       searchForm: {
         timeType: 1,
         month: '', // 日期
+        // monthRange: '', // 月度范围
         shop: '',
         dataType: []
       },
@@ -209,7 +224,8 @@ export default {
       fileType: ['xlsx', 'xls'],
       monthDialogTitle: '',
       cacheMonth: '',
-      cacheTimeSection: []
+      cacheTimeSection: [],
+      monthRangeRadomLey: 1
     }
   },
   watch: {
@@ -284,7 +300,6 @@ export default {
       })
     },
     searchHandle () {
-      //
       this.searchClick = true
       const dataTypeArr = []
       this.searchForm.dataType.map(i => {
@@ -297,6 +312,10 @@ export default {
         shop: this.searchForm.shop,
         dataType: dataTypeArr.join() || ''
       })
+      if (this.submitForm.timeType === 7) {
+        this.submitForm.startDate = monthSpliceDay(this.submitForm.startDate)[0]
+        this.submitForm.endDate = monthSpliceDay(this.submitForm.endDate)[1]
+      }
       this.cacheTimeSection = [...this.timeSection]
       this.cacheMonth = this.searchForm.month || ''
     },
@@ -384,7 +403,7 @@ export default {
         this.$store.commit('SETSPINNING', false)
         this.fileList = []
         if (res.data.errorCode === 1) {
-          this.$message.success('导入成功')
+          this.$message.success('导入成功，汇总数据显示可能会有延迟')
           const msgArr = res.data.data || []
           if (msgArr && msgArr.length > 0) {
             let tipMsg = ''

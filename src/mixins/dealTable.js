@@ -1,7 +1,9 @@
 import { getLastSevenDay, getLastThirtyDay, prevWeek, prevYear, recentYear, monthSpliceDay } from '../common/utils/timeCalc'
+import { createUUID } from '../common/utils/funcStore'
 const mixins = {
   data () {
     return {
+      pickerRangeMonth: '',
       pickerMinDate: '',
       pickerOptions: {
         onPick: ({ maxDate, minDate }) => {
@@ -28,6 +30,32 @@ const mixins = {
         disabledDate: (time) => {
           return time.getTime() > new Date(`${this.getLastMonth()}-01`).getTime() // 如果现在是12月，则getLastMonth（）为 2020-11，那么十二月不能选，之后年的月份都不可选
         }
+      },
+      monthRangePickerOptions: {
+        onPick: ({ maxDate, minDate }) => {
+          console.log(maxDate)
+          console.log(minDate)
+          this.pickerRangeMonth = (minDate && minDate.getTime()) || (maxDate && maxDate.getTime())
+          // console.log(maxDate)
+          // console.log(minDate)
+          if (maxDate) {
+            this.pickerRangeMonth = ''
+          }
+        },
+        disabledDate: (time) => {
+          // console.log(this.pickerRangeMonth)
+          if (this.pickerRangeMonth) {
+            const pickYear1 = 365 * 24 * 3600 * 1000
+            const pickYear2 = 330 * 24 * 3600 * 1000
+            let maxTime = this.pickerRangeMonth + pickYear1
+            const minTime = this.pickerRangeMonth - pickYear2
+            if (maxTime > new Date()) {
+              maxTime = new Date()
+            }
+            return (time && time.getTime() >= maxTime) || (time && time.getTime() <= minTime)
+          }
+          return time && time.getTime() > Date.now()
+        }
       }
     }
   },
@@ -38,8 +66,8 @@ const mixins = {
       return flag
     },
     timeTypeSelect () {
-      if (this.submitForm.timeType === 0 || this.submitForm.timeType === 3) {
-        if (this.submitForm.timeType === 0) {
+      if (this.submitForm.timeType === 0 || this.submitForm.timeType === 7 || this.submitForm.timeType === 3) {
+        if (this.submitForm.timeType === 0 || this.submitForm.timeType === 7) {
           return this.cacheTimeSection.length > 0 ? `${this.cacheTimeSection[0]}~${this.cacheTimeSection[1]}` : ''
         } else {
           return this.searchForm.month || this.cacheMonth
@@ -56,7 +84,13 @@ const mixins = {
 
   },
   watch: {
-
+    'timeSection' (newVal, oldVal) {
+      // 清除时，重置月度范围选择控件
+      if (this.searchForm.timeType === 7 && !newVal) {
+        this.monthRangeRadomLey = createUUID()
+        this.pickerRangeMonth = ''
+      }
+    }
   },
   methods: {
     getLastMonth () { // 获取上个月日期 格式 2020-12
@@ -123,12 +157,12 @@ const mixins = {
     timeTypeChange (timeType) {
       this.timeSection = []
       this.searchForm.month = ''
+      // this.searchForm.monthRange = ''
       switch (timeType) {
         // 最近7天
         case 1:
           this.timeSection = getLastSevenDay()
           break
-
         // 上周
         case 2:
           this.timeSection = prevWeek()
@@ -155,6 +189,10 @@ const mixins = {
         case 6:
           this.timeSection = prevYear()
           break
+        // 月度范围
+        // case 7:
+        //   this.timeSection = monthRange()
+        //   break
       }
     },
     // 格式化月份时间
