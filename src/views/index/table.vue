@@ -6,6 +6,7 @@
                 class="custom-table"
                 :span-method="rowMerge"
                 border
+                :key="tableRandomKey"
                 :max-height="calcHeight">
         <el-table-column v-for="(cloumn,index) in columns"
                          :fixed="cloumn.isFixed"
@@ -39,7 +40,8 @@
           <!-- 插槽-自定义表格 -->
           <template slot-scope="scope">
             <div v-if="cloumn.edit&&cloumn.isEdit&&scope.row.cellEdit"
-                 class="has-input">
+                 class="has-input"
+                 :class="{'zebra':cloumn.bold}">
               <el-form-item :prop="cloumn.key+scope.$index+'.updateData'"
                             class="table-input"
                             :rules="[{ required: true, message: '请输入', trigger: 'blur' },
@@ -74,11 +76,23 @@
         </el-table-column>
       </el-table>
     </el-form>
+    <div class="flex-end pagination-wrap">
+      <el-pagination background
+                     v-if="tableTotal>0"
+                     layout="prev, pager, next"
+                     :page-size="pageSize"
+                     :key="paginationKey"
+                     @current-change="currentChange"
+                     :current-page="currentPage"
+                     :total="tableTotal">
+      </el-pagination>
+    </div>
+
   </div>
 </template>
 <script>
 
-// import { createUUID } from '@/common/utils/funcStore'
+import { createUUID } from '@/common/utils/funcStore'
 import { mapMutations, mapGetters } from 'vuex'
 export default {
   props: {
@@ -99,13 +113,21 @@ export default {
     return {
       columns: [],
       columnKeyArr: [], // 当前column的所有集合
+      tableAllData: [],
       tableData: [],
       editTable: {},
       promotIdArr: [],
       filterLength: 0,
       isViewMonth: false,
       tableKey: 1,
-      isShowTable: false
+      isShowTable: false,
+      tableTotal: 0,
+      currentPage: 1,
+      pageSize: 2,
+      allPromotId: [],
+      tableRandomKey: 1,
+      paginationKey: 1,
+      currentEditIndex: null
     }
   },
   watch: {
@@ -198,12 +220,27 @@ export default {
         })
       })
     },
-    getTableData () {
+    getTableData (isTurnPage = false) {
+      this.tableAllData = []
       this.tableData = []
       this.promotIdArr = []
+      if (!isTurnPage) {
+        this.currentPage = 1
+      }
       this.$store.commit('SETSPINNING', true)
       this.$request.post('/getList', this.form, true).then(res => {
-        this.tableData = res.data || []
+        this.tableAllData = res.data || []
+        const newArr = this.formatRowspanAndColspan(this.tableAllData, 'promoID')
+        this.allPromotId = []
+        if (newArr.length > 0) {
+          newArr.map(i => {
+            if (i.num > 0) {
+              this.allPromotId.push(i)
+            }
+          })
+        }
+        this.tableTotal = this.allPromotId.length || 0
+        this.scliceTableData()
         this.tableData.map(i => {
           this.promotIdArr.push(i.promoID)
         })
@@ -215,6 +252,7 @@ export default {
       })
     },
     toEdit (index) {
+      this.currentEditIndex = index
       // 每次编辑一行
       const columnsLen = this.columns.length
       for (let k = 0; k < columnsLen; k++) {
@@ -224,7 +262,6 @@ export default {
       }
       const target = this.columns[index]
       target.isEdit = true
-      // this.$set(this.columns, index, target)
       if (this.columnKeyArr.length > 0) {
         const columnKey = target.key
         const cacheArr = []
@@ -267,58 +304,62 @@ export default {
         this.SAVECACHEDATA(cacheArr)
       }
     },
-    submitData (editIndexKey) {
-      this.$refs.editTable.validate((valid) => {
-        if (valid) {
-          const copyEdittable = JSON.parse(JSON.stringify(this.editTable))
-          // 如果缓存的当前列为空，则当前整列为不可编辑。
-          if (this.getCacheData.length > 0) {
-            Object.keys(this.editTable).forEach(eachKey => {
-              const target = this.getCacheData.filter(i => i.cacheKey === eachKey)
-              if (target.length > 0) {
-                if (this.editTable[eachKey].updateData === target[0].updateData) {
-                  delete copyEdittable[eachKey]
+    submitData (editIndexKey, isTurnPage = false) {
+      return new Promise((resolve) => {
+        this.$refs.editTable.validate((valid) => {
+          if (valid) {
+            const copyEdittable = JSON.parse(JSON.stringify(this.editTable))
+            // 如果缓存的当前列为空，则当前整列为不可编辑。
+            if (this.getCacheData.length > 0) {
+              Object.keys(this.editTable).forEach(eachKey => {
+                const target = this.getCacheData.filter(i => i.cacheKey === eachKey)
+                if (target.length > 0) {
+                  if (this.editTable[eachKey].updateData === target[0].updateData) {
+                    delete copyEdittable[eachKey]
+                  }
                 }
-              }
-            })
-          }
-          if (Object.keys(copyEdittable).length > 0) {
-            const submitArr = []
-            Object.keys(copyEdittable).map(key => {
-              if (copyEdittable[key].dataID === 3) {
-                copyEdittable[key].updateData /= 100
-              }
-              submitArr.push(copyEdittable[key])
-            })
-            this.$request.post('/edit', {
-              shop: this.form.shop,
-              dataJson: JSON.stringify(submitArr)
-            }).then(res => {
-              if (res.errorCode === 1) {
-                if (res.data) {
-                  this.$message.warning(res.data)
-                } else {
-                  this.$message.success('保存成功，汇总数据显示可能会有延迟')
-                  this.getColumns()
-                  this.getTableData()
+              })
+            }
+            if (Object.keys(copyEdittable).length > 0) {
+              const submitArr = []
+              Object.keys(copyEdittable).map(key => {
+                if (copyEdittable[key].dataID === 3) {
+                  copyEdittable[key].updateData /= 100
                 }
-              }
-            })
+                submitArr.push(copyEdittable[key])
+              })
+              this.$request.post('/edit', {
+                shop: this.form.shop,
+                dataJson: JSON.stringify(submitArr)
+              }).then(res => {
+                if (res.errorCode === 1) {
+                  if (res.data) {
+                    resolve(false)
+                    this.$message.warning(res.data)
+                  } else {
+                    resolve(true)
+                    this.editTable = {}
+                    this.SAVECACHEDATA([])
+                    this.$message.success('保存成功，汇总数据显示可能会有延迟')
+                    if (!isTurnPage) {
+                      this.getColumns()
+                      this.getTableData()
+                    }
+                  }
+                }
+              })
+            } else {
+              // 不保存取消编辑
+              const target = this.columns[editIndexKey]
+              target.isEdit = false
+              resolve(true)
+            }
           } else {
-            // 不保存取消编辑
-            // const columnsLen = this.columns.length
-            // for (let k = 0; k < columnsLen; k++) {
-            //   if (this.columns[k].edit) {
-            //     this.columns[k].isEdit = false
-            //   }
-            // }
-            const target = this.columns[editIndexKey]
-            target.isEdit = false
+            this.$message.warning('当前有未填写的数据，请检查后提交')
+            resolve(false)
+            return false
           }
-        } else {
-          // this.$message.warning('输入有误，请核查数据')
-          return false
-        }
+        })
       })
     },
     viewMonthData (columnKey, columnValue) {
@@ -371,7 +412,6 @@ export default {
     rowMerge ({ row, column, rowIndex, columnIndex }) {
       // 合并第一列
       const newArr = this.formatRowspanAndColspan(this.tableData, 'promoID')
-
       if (columnIndex === 0) {
         const num = newArr[rowIndex].num
         if (num > 1) {
@@ -391,6 +431,102 @@ export default {
           }
         }
       }
+    },
+    judgeEditCache () {
+      return new Promise((resolve, reject) => {
+        const copyEdittable = JSON.parse(JSON.stringify(this.editTable))
+        // 如果缓存的当前列为空，则当前整列为不可编辑。
+        if (this.getCacheData.length > 0) {
+          Object.keys(this.editTable).forEach(eachKey => {
+            const target = this.getCacheData.filter(i => i.cacheKey === eachKey)
+            if (target.length > 0) {
+              if (this.editTable[eachKey].updateData === target[0].updateData) {
+                delete copyEdittable[eachKey]
+              }
+            }
+          })
+        }
+        const submitArr = []
+        if (Object.keys(copyEdittable).length > 0) {
+          Object.keys(copyEdittable).map(key => {
+            if (copyEdittable[key].dataID === 3) {
+              copyEdittable[key].updateData /= 100
+            }
+            submitArr.push(copyEdittable[key])
+          })
+        }
+        resolve(submitArr.length > 0)
+      })
+
+      // console.log(submitArr)
+    },
+    currentChange (pageNum) {
+      this.pageNumChange(pageNum)
+    },
+    scliceTableData () {
+      if (this.currentPage === 1) {
+        this.tableAllData.slice(0, this.allPromotId.slice(0, this.pageSize).reduce((prev, cur) => prev + cur.num, 0)).forEach(i => {
+          this.tableData.push(i)
+        })
+      } else {
+        const sliceStatr = this.allPromotId.slice(0, (this.currentPage - 1) * this.pageSize).reduce((prev, cur) => prev + cur.num, 0)
+        const sliceEnd = this.allPromotId.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize).reduce((prev, cur) => prev + cur.num, 0)
+        this.tableAllData.slice(sliceStatr, sliceStatr + sliceEnd).forEach(i => {
+          this.tableData.push(i)
+        })
+      }
+    },
+    async turnPage (pageNum) {
+      this.$store.commit('SETSPINNING', true)
+      this.tableRandomKey = createUUID()
+      const columnsLen = this.columns.length
+      for (let k = 0; k < columnsLen; k++) {
+        if (this.columns[k].edit) {
+          this.columns[k].isEdit = false
+        }
+      }
+      this.editTable = {}
+      this.SAVECACHEDATA([])
+      this.currentPage = pageNum
+      this.tableData = []
+      await this.scliceTableData()
+      this.$nextTick(() => {
+        this.$store.commit('SETSPINNING', false)
+      })
+    },
+    pageNumChange (pageNum) {
+      this.judgeEditCache().then(res => {
+        if (res) {
+          this.$emit('confirmCoverDialog', true)
+          this.$confirm('当前有未保存的数据，请确认是否保存', '提示', {
+            closeOnClickModal: false,
+            distinguishCancelAndClose: true,
+            confirmButtonText: '保存',
+            cancelButtonText: '放弃修改'
+          }
+          ).then(() => {
+            this.$emit('confirmCoverDialog', false)
+            // 保存数据
+            this.submitData(this.currentEditIndex, true).then(res => {
+              if (res) {
+                this.currentPage = pageNum
+                this.getColumns()
+                this.getTableData(true)
+              } else {
+                this.paginationKey = createUUID()
+              }
+            })
+
+            //
+          }).catch(() => {
+            this.$emit('confirmCoverDialog', false)
+            this.currentPage = pageNum
+            this.turnPage(pageNum)
+          })
+        } else {
+          this.turnPage(pageNum)
+        }
+      })
     }
   }
 }

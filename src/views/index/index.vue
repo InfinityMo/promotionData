@@ -158,6 +158,7 @@
       </div>
     </div>
     <el-dialog custom-class="journal-dialog"
+               :class="{'confirm-cover-dialog':confirmCover}"
                width="1000px"
                top="40px"
                :modal="true"
@@ -171,6 +172,7 @@
       <Table :form="monthForm"
              :monthDialogBoolean="true"
              :userPowerArr="userPowerArr"
+             @confirmCoverDialog="confirmCoverDialog"
              @tableRender="dialogTableRender" />
     </el-dialog>
   </div>
@@ -225,7 +227,8 @@ export default {
       monthDialogTitle: '',
       cacheMonth: '',
       cacheTimeSection: [],
-      monthRangeRadomLey: 1
+      monthRangeRadomLey: 1,
+      confirmCover: false
     }
   },
   watch: {
@@ -324,10 +327,13 @@ export default {
         this.$store.commit('SETSPINNING', false)
         if (this.searchClick && flag) {
           setTimeout(() => {
-            scrollTo(135)
+            scrollTo(120)
           }, 500)
         }
       })
+    },
+    confirmCoverDialog (flag) {
+      this.confirmCover = flag
     },
     dialogTableRender (flag) {
       if (flag) {
