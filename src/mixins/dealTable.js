@@ -33,17 +33,12 @@ const mixins = {
       },
       monthRangePickerOptions: {
         onPick: ({ maxDate, minDate }) => {
-          console.log(maxDate)
-          console.log(minDate)
           this.pickerRangeMonth = (minDate && minDate.getTime()) || (maxDate && maxDate.getTime())
-          // console.log(maxDate)
-          // console.log(minDate)
           if (maxDate) {
             this.pickerRangeMonth = ''
           }
         },
         disabledDate: (time) => {
-          // console.log(this.pickerRangeMonth)
           if (this.pickerRangeMonth) {
             const pickYear1 = 365 * 24 * 3600 * 1000
             const pickYear2 = 330 * 24 * 3600 * 1000
