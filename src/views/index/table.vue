@@ -35,6 +35,8 @@
                     :class="{'fontBold':cloumn.bold}">{{cloumn.value}}</span>
               <span v-else
                     :class="{'fontBold':cloumn.bold}">{{cloumn.value}}</span>
+              <i v-if="cloumn.key==='dataType'&&tableData.length>0"
+                 class="data-pk-icon"></i>
             </div>
           </template>
           <!-- 插槽-自定义表格 -->
@@ -70,7 +72,10 @@
                   </p>
                 </el-tooltip>
               </div>
-              <div v-else>{{scope.row[cloumn.key]}}</div>
+              <div v-else>{{scope.row[cloumn.key]}}<i @click="trendPromot(cloumn.key,scope)"
+                   v-if="cloumn.key==='promoType'"
+                   class="data-trend-icon"></i>
+              </div>
             </div>
           </template>
         </el-table-column>
@@ -94,6 +99,7 @@
 
 import { createUUID } from '@/common/utils/funcStore'
 import { mapMutations, mapGetters } from 'vuex'
+import { Base64 } from 'js-base64'
 export default {
   props: {
     form: {
@@ -163,7 +169,7 @@ export default {
     })
   },
   methods: {
-    ...mapMutations({ SAVECACHEDATA: 'SAVECACHEDATA' }),
+    ...mapMutations({ SAVECACHEDATA: 'SAVECACHEDATA', SAVETABLEDATAALL: 'SAVETABLEDATAALL' }),
     getColumns () {
       this.columns = []
       this.columnKeyArr = []
@@ -181,7 +187,7 @@ export default {
                 i.isFixed = true
                 i.align = 'left'
                 if (i.key === 'promoType') {
-                  i.width = '153'
+                  i.width = '173'
                 }
                 if (i.key === 'dataType') {
                   i.width = '196'
@@ -230,6 +236,7 @@ export default {
       this.$store.commit('SETSPINNING', true)
       this.$request.post('/getList', this.form, true).then(res => {
         this.tableAllData = res.data || []
+        this.SAVETABLEDATAALL(this.tableAllData)
         const newArr = this.formatRowspanAndColspan(this.tableAllData, 'promoID')
         this.allPromotId = []
         if (newArr.length > 0) {
@@ -457,8 +464,6 @@ export default {
         }
         resolve(submitArr.length > 0)
       })
-
-      // console.log(submitArr)
     },
     currentChange (pageNum) {
       this.pageNumChange(pageNum)
@@ -527,6 +532,23 @@ export default {
           this.turnPage(pageNum)
         }
       })
+    },
+    trendPromot (promotKey, scope) {
+      const { row } = scope
+      const rowType = Object.keys(row).findIndex(i => {
+        return /^_/.test(i)
+      })
+      // 非年度数据
+      const isNormalData = rowType >= 0 ? 1 : 0
+      // 将当前选择的数据保存在vuex中
+      const routeUrl = this.$router.resolve({
+        name: 'TrendPromot',
+        query: {
+          promotId: Base64.encode(row.promoID),
+          nData: Base64.encode(isNormalData)
+        }
+      })
+      window.open(routeUrl.href, '_blank')
     }
   }
 }

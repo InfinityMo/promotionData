@@ -17,6 +17,12 @@ const routes = [
     component: () => import('@/views/index/index.vue')
   },
   {
+    path: '/trendPromot',
+    name: 'TrendPromot',
+    meta: { title: '' },
+    component: () => import('@/views/chart/trendPromot.vue')
+  },
+  {
     path: '/401',
     name: 'forbidden',
     component: () => import('@/views/401/index.vue')
