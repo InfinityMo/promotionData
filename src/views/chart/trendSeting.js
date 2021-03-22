@@ -1,3 +1,4 @@
+import { setTousandNum } from '@/common/utils/funcStore'
 const gobalReg = {
   reg: ''
 }
@@ -29,9 +30,9 @@ export const dealTrendData = (promotData, dataType, nData) => {
         if (gobalReg.reg.test(k)) {
           if (Number(nData)) {
             if (k.length > 7) {
-              chartObj.timeArr.push(`${k.substr(1, 5)}-${k.substr(5, 2)}-${k.substr(7)}`)
+              chartObj.timeArr.push(`${k.substr(1, 4)}-${k.substr(5, 2)}-${k.substr(7)}`)
             } else {
-              chartObj.timeArr.push(`${k.substr(1, 5)}-${k.substr(5, 2)}`)
+              chartObj.timeArr.push(`${k.substr(1, 4)}-${k.substr(5, 2)}`)
             }
           } else {
             chartObj.timeArr.push(`${k.substr(3, 4)}-${k.substr(7, 2)}`)
@@ -42,6 +43,9 @@ export const dealTrendData = (promotData, dataType, nData) => {
   })
   // 构建series
   createSeries(selectData)
+  // -1为无右侧百分比坐标系，不等于1为有百分比坐标系
+  const isPrecent = chartObj.seriesData.findIndex(item => item.yAxisIndex === 1)
+  return { isPrecent: isPrecent, timeArr: chartObj.timeArr }
   // setChartOption(legend, timeArr, seriesData)
 }
 const createSeries = (selectData) => {
@@ -85,27 +89,34 @@ const listData = (item) => {
   })
 }
 
-export const setChartOption = () => {
+export const setChartOption = (isPrecent) => {
   const trendPromot = {
     grid: {
       top: '10%',
       left: '80',
-      bottom: '80',
+      bottom: '60',
       right: '80'
     },
     tooltip: {
-      trigger: 'axis',
+      trigger: 'item',
       axisPointer: {
         type: 'none'
+      },
+      formatter (params) {
+        if (params.seriesIndex === isPrecent) {
+          return `${params.seriesName}<br/>${params.marker}${params.name}：${params.data}%`
+        } else {
+          return `${params.seriesName}<br/>${params.marker}${params.name}：${setTousandNum(params.data)}`
+        }
       }
     },
     legend: {
       data: chartObj.legend,
-      top: '2%',
-      right: '100',
+      top: '0',
+      right: '10',
       textStyle: {
         color: '#333',
-        fontSize: 16
+        fontSize: 14
       }
     },
     xAxis: {
@@ -156,6 +167,11 @@ export const setChartOption = () => {
     },
     {
       type: 'value',
+      name: 'yPrecent',
+      nameTextStyle: {
+        color: '#fff',
+        fontSize: 1
+      },
       position: 'right',
       splitLine: {
         show: false
@@ -164,7 +180,7 @@ export const setChartOption = () => {
         show: false
       },
       axisLine: {
-        show: true
+        show: isPrecent !== -1
       },
       axisLabel: {
         show: true,

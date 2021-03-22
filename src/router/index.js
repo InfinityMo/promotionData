@@ -23,6 +23,12 @@ const routes = [
     component: () => import('@/views/chart/trendPromot.vue')
   },
   {
+    path: '/trendDataType',
+    name: 'TrendDataType',
+    meta: { title: '' },
+    component: () => import('@/views/chart/trendDataType.vue')
+  },
+  {
     path: '/401',
     name: 'forbidden',
     component: () => import('@/views/401/index.vue')

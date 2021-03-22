@@ -277,7 +277,7 @@ export default {
     })
   },
   methods: {
-    ...mapMutations({ SAVESHOPID: 'SAVESHOPID' }),
+    ...mapMutations({ SAVESHOPID: 'SAVESHOPID', SAVESHOPDATA: 'SAVESHOPDATA' }),
     dealUserPower () {
       Object.keys(this.userPower).map(i => {
         this.userPowerArr = this.userPower[i]
@@ -286,6 +286,8 @@ export default {
     getSelectData () {
       Promise.all([this._getSelectData(1), this._getCascader(2)]).then(res => {
         this.shopArr = res[0]
+        // 缓存当前的所有店铺信息
+        this.SAVESHOPDATA(this.shopArr)
         this.searchForm.shop = this.shopArr[0].value || ''
         this.submitForm.shop = this.shopArr[0].value || ''
         this.extendOptions = res[1]

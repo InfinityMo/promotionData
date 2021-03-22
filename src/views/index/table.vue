@@ -35,7 +35,8 @@
                     :class="{'fontBold':cloumn.bold}">{{cloumn.value}}</span>
               <span v-else
                     :class="{'fontBold':cloumn.bold}">{{cloumn.value}}</span>
-              <i v-if="cloumn.key==='dataType'&&tableData.length>0"
+              <i @click="pkDataType"
+                 v-if="cloumn.key==='dataType'&&tableData.length>0"
                  class="data-pk-icon"></i>
             </div>
           </template>
@@ -92,7 +93,55 @@
                      :total="tableTotal">
       </el-pagination>
     </div>
-
+    <el-dialog custom-class="journal-dialog edit-pwd"
+               title="数据选择"
+               width="432px"
+               top="40px"
+               :modal="true"
+               :close-on-click-modal="false"
+               @close="pkDataDialogClose"
+               :visible.sync="pkDataShow">
+      <el-form label-width="81px"
+               :model="pkDataFrom"
+               :rules="pkDataFromRules"
+               ref="pkDataFrom">
+        <el-form-item label="数据类型："
+                      prop="dataType">
+          <el-select placeholder="请选择数据类型"
+                     popper-class="dialog-select"
+                     v-model="pkDataFrom.dataType"
+                     @change="dataTypeChange">
+            <el-option v-for="item in pkDataTypeArr"
+                       :key="item.value"
+                       :label="item.label"
+                       :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="推广工具："
+                      prop="promot">
+          <el-select placeholder="请选择推广工具"
+                     popper-class="dialog-select"
+                     v-model="pkDataFrom.promot"
+                     multiple
+                     collapse-tags
+                     :multiple-limit=5
+                     :disabled="!Boolean(String(pkDataFrom.dataType)) ">
+            <el-option v-for="item in pkPromotArr"
+                       :key="item.value"
+                       :label="item.label"
+                       :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <span slot="footer"
+            class="dialog-footer user-edit">
+        <el-button @click="pkDataShow = false">取 消</el-button>
+        <el-button type="primary"
+                   @click="pkDataHandle">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -100,6 +149,7 @@
 import { createUUID } from '@/common/utils/funcStore'
 import { mapMutations, mapGetters } from 'vuex'
 import { Base64 } from 'js-base64'
+import { pkDataFrom, pkDataFromRules } from './pkData'
 export default {
   props: {
     form: {
@@ -133,7 +183,12 @@ export default {
       allPromotId: [],
       tableRandomKey: 1,
       paginationKey: 1,
-      currentEditIndex: null
+      currentEditIndex: null,
+      pkDataShow: false,
+      pkDataFrom: Object.assign({}, pkDataFrom),
+      pkDataFromRules: pkDataFromRules,
+      pkDataTypeArr: [],
+      pkPromotArr: []
     }
   },
   watch: {
@@ -169,7 +224,7 @@ export default {
     })
   },
   methods: {
-    ...mapMutations({ SAVECACHEDATA: 'SAVECACHEDATA', SAVETABLEDATAALL: 'SAVETABLEDATAALL' }),
+    ...mapMutations({ SAVECACHEDATA: 'SAVECACHEDATA', SAVEPKCHECKDATA: 'SAVEPKCHECKDATA' }),
     getColumns () {
       this.columns = []
       this.columnKeyArr = []
@@ -236,7 +291,6 @@ export default {
       this.$store.commit('SETSPINNING', true)
       this.$request.post('/getList', this.form, true).then(res => {
         this.tableAllData = res.data || []
-        this.SAVETABLEDATAALL(this.tableAllData)
         const newArr = this.formatRowspanAndColspan(this.tableAllData, 'promoID')
         this.allPromotId = []
         if (newArr.length > 0) {
@@ -541,14 +595,72 @@ export default {
       // 非年度数据
       const isNormalData = rowType >= 0 ? 1 : 0
       // 将当前选择的数据保存在vuex中
+      const copyForm = JSON.stringify(Object.assign({}, this.form))
       const routeUrl = this.$router.resolve({
         name: 'TrendPromot',
         query: {
           promotId: Base64.encode(row.promoID),
-          nData: Base64.encode(isNormalData)
+          nData: Base64.encode(isNormalData),
+          form: Base64.encode(copyForm)
         }
       })
       window.open(routeUrl.href, '_blank')
+    },
+    // 比对同数据类型的不同推广工具
+    pkDataType () {
+      this.pkDataShow = true
+      this.pkDataTypeArr = []
+      this.tableAllData.forEach(item => {
+        if (!this.pkDataTypeArr.find(i => i.value === item.dataID)) {
+          this.pkDataTypeArr.push({
+            value: item.dataID,
+            label: item.dataType
+          })
+        }
+      })
+    },
+    dataTypeChange (value) {
+      this.pkDataFrom.promot = []
+      this.pkPromotArr = []
+      this.tableAllData.forEach(item => {
+        if (item.dataID === this.pkDataFrom.dataType) {
+          if (!this.pkPromotArr.find(i => i.value === item.promoID)) {
+            this.pkPromotArr.push({
+              value: item.promoID,
+              label: item.promoType
+            })
+          }
+        }
+      })
+    },
+    pkDataHandle () {
+      this.$refs.pkDataFrom.validate((valid) => {
+        if (valid) {
+          // 保存可选择的全部数据
+          this.SAVEPKCHECKDATA({
+            pkDataTypeArr: this.pkDataTypeArr,
+            pkPromotArr: this.pkPromotArr
+          })
+          const copyForm = JSON.stringify(Object.assign({}, this.form))
+          const pkDataFrom = JSON.stringify(Object.assign({}, this.pkDataFrom))
+          const routeUrl = this.$router.resolve({
+            name: 'TrendDataType',
+            query: {
+              form: Base64.encode(copyForm),
+              pkDataFrom: Base64.encode(pkDataFrom)
+            }
+          })
+          window.open(routeUrl.href, '_blank')
+          this.pkDataShow = false
+          this.pkDataDialogClose()
+        } else {
+          return false
+        }
+      })
+      // console.log(this.pkDataFrom.dataType)
+    },
+    pkDataDialogClose () {
+      this.$refs.pkDataFrom.resetFields()
     }
   }
 }

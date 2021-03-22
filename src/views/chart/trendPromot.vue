@@ -1,7 +1,7 @@
 <template>
   <div class="trend-wrap">
     <div class="title-wrap flex-between-center">
-      <div class="title">{{title}}数据趋势对比图</div>
+      <div class="title">{{dateShop}}{{title}}数据趋势图</div>
       <div class="flex-item-center">
         <p>选择数据类型(最多选8种)：</p>
         <el-select class="select"
@@ -20,7 +20,8 @@
       </div>
     </div>
     <div class="chart-wrap"
-         ref="chart"></div>
+         ref="chart">
+    </div>
   </div>
 </template>
 <script>
@@ -31,36 +32,51 @@ import { mapGetters } from 'vuex'
 export default {
   data () {
     return {
+      form: {},
+      promotId: '',
       nData: '',
+      dateShop: '',
+      isPrecent: false,
       title: '',
       trendChart: null,
       dataType: [],
       cacheDataType: [],
       promotOptions: [],
-      filterData: [] // 当前图表数据源
+      filterData: [], // 当前图表数据源
+      tableAllData: []
     }
   },
   computed: {
     ...mapGetters([
-      'getTableAllData'
+      'getShopData'
     ])
   },
-  watch: {
-
+  created () {
+    this.form = JSON.parse(Base64.decode(this.$route.query.form))
+    this.promotId = Base64.decode(this.$route.query.promotId) || ''
+    this.nData = Base64.decode(this.$route.query.nData) || ''
+    this.getChartData()
   },
   mounted () {
-    this.nData = Base64.decode(this.$route.query.nData)
-    this.getChartData(Base64.decode(this.$route.query.promotId))
-    // debugger
     // 窗口变化重置图表
     window.addEventListener('resize', this.resizeChart, false)
   },
   methods: {
-    getChartData (promotId) {
-      // eslint-disable-next-line
-      this.filterData = this.getTableAllData.filter(i => i.promoID == promotId)
-      this.title = this.filterData[0].promoType
-      this.setPromotOption() // 生成选择数据类型
+    getChartData () {
+      this.$request.post('/getList', this.form).then(res => {
+        this.tableAllData = res.data || []
+        // eslint-disable-next-line
+        this.filterData = this.tableAllData.filter(i => i.promoID == this.promotId)
+        this.title = this.filterData[0].promoType
+        this.setPromotOption() // 生成选择数据类型
+      })
+    },
+    setTitle (timeArr) {
+      // eslint-disable-next-line eqeqeq
+      const target = this.getShopData.filter(i => i.value == this.form.shop)[0]
+      if (target) {
+        this.dateShop = `${timeArr[0]}~${timeArr[timeArr.length - 1]}—${target.label}—`
+      }
     },
     setPromotOption () {
       this.filterData.forEach(i => {
@@ -71,7 +87,9 @@ export default {
       })
       // 默认选择前两项类型
       this.dataType = [this.promotOptions[0].value, this.promotOptions[1].value]
-      dealTrendData(this.filterData, this.dataType, this.nData)
+      const returnObj = dealTrendData(this.filterData, this.dataType, this.nData)
+      this.isPrecent = returnObj.isPrecent
+      this.setTitle(returnObj.timeArr)
       this.createChart()
     },
     createChart () {
@@ -80,7 +98,7 @@ export default {
     },
     setChart (trendChart) {
       this.trendChart.setOption({}, true)
-      this.trendChart.setOption(setChartOption())
+      this.trendChart.setOption(setChartOption(this.isPrecent))
     },
     selectChange (value) {
       if (value.length === 1) {
@@ -90,7 +108,8 @@ export default {
         this.$message.warning('请至少选择一个数据类型')
         this.dataType.push(this.cacheDataType[0])
       }
-      dealTrendData(this.filterData, this.dataType, this.nData)
+      const returnObj = dealTrendData(this.filterData, this.dataType, this.nData)
+      this.isPrecent = returnObj.isPrecent
       this.setChart()
     },
     resizeChart () {

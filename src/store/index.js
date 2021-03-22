@@ -15,7 +15,9 @@ export default new Vuex.Store({
     permissionsCode: '',
     userPower: [],
     shopId: '',
-    tableDataAll: []
+    shopData: [],
+    pkCheckData: {}
+    // tableDataAll: []
   },
   getters: {
     getCacheData: state => state.cacheData,
@@ -27,7 +29,9 @@ export default new Vuex.Store({
       return state.userData || {}
     },
     getUserPower: state => state.userPower,
-    getTableAllData: state => state.tableDataAll
+    getShopData: state => state.shopData,
+    getPkCheckData: state => state.pkCheckData
+    // getTableAllData: state => state.tableDataAll
   },
   mutations: {
     // 突变配置加载loading的状态
@@ -53,11 +57,18 @@ export default new Vuex.Store({
     SAVESHOPID (state, payload) {
       state.shopId = payload
     },
-    SAVETABLEDATAALL (state, payload) {
-      state.tableDataAll = []
-      state.tableDataAll = payload
-      console.log(state.tableDataAll)
+    SAVESHOPDATA (state, payload) {
+      state.shopData = []
+      state.shopData = payload
     },
+    SAVEPKCHECKDATA (state, payload) {
+      state.pkCheckData = {}
+      state.pkCheckData = payload
+    },
+    // SAVETABLEDATAALL (state, payload) {
+    //   state.tableDataAll = []
+    //   state.tableDataAll = payload
+    // },
     RESETHEADERDATA (state) {
       state.trackId = ''
       state.permissionsCode = ''
@@ -65,7 +76,7 @@ export default new Vuex.Store({
       state.permissionsCode = ''
       state.userPower = []
       state.shopId = ''
-      state.tableDataAll = []
+      state.shopData = []
     }
   },
   // 配置异步提交状态
