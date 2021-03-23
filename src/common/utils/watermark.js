@@ -1,6 +1,6 @@
 const watermark = {}
 
-const setWatermark = (str) => {
+const setWatermark = (str, distanceTop) => {
   const id = '1.23452384164.123412416'
 
   if (document.getElementById(id) !== null) {
@@ -28,7 +28,7 @@ const setWatermark = (str) => {
   const div = document.createElement('div')
   div.id = id
   div.style.pointerEvents = 'none'
-  div.style.top = '220px'
+  div.style.top = `${distanceTop}px`
   div.style.left = '0px'
   div.style.position = 'fixed'
   div.style.zIndex = '100000'
@@ -40,15 +40,15 @@ const setWatermark = (str) => {
 }
 
 // 该方法只允许调用一次
-watermark.set = (str) => {
-  let id = setWatermark(str)
+watermark.set = (str, distanceTop = 220) => {
+  let id = setWatermark(str, distanceTop)
   setInterval(() => {
     if (document.getElementById(id) === null) {
-      id = setWatermark(str)
+      id = setWatermark(str, distanceTop)
     }
   }, 500)
   window.onresize = () => {
-    setWatermark(str)
+    setWatermark(str, distanceTop)
   }
 }
 

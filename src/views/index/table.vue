@@ -98,6 +98,7 @@
                width="432px"
                top="40px"
                :modal="true"
+               v-if="pkDataShow"
                :close-on-click-modal="false"
                @close="pkDataDialogClose"
                :visible.sync="pkDataShow">
@@ -650,14 +651,15 @@ export default {
               pkDataFrom: Base64.encode(pkDataFrom)
             }
           })
-          window.open(routeUrl.href, '_blank')
+          setTimeout(() => {
+            window.open(routeUrl.href, '_blank')
+          }, 20)
           this.pkDataShow = false
           this.pkDataDialogClose()
         } else {
           return false
         }
       })
-      // console.log(this.pkDataFrom.dataType)
     },
     pkDataDialogClose () {
       this.$refs.pkDataFrom.resetFields()

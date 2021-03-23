@@ -2,9 +2,8 @@
   <div>
     <div class="trend-wrap">
       <div class="title-wrap flex-between-center">
-        <div class="title">{{`${shopTitle}-`}}数据趋势图</div>
+        <div class="title">{{datatitle}}<br />{{shopTitle}}</div>
         <div class="flex-item-center">
-          <!-- <p>选择数据类型(最多选8种)：</p> -->
           <el-form label-width="70px"
                    class="flex">
             <el-form-item label="数据类型："
@@ -50,6 +49,7 @@ import echarts from 'echarts'
 import { mapGetters } from 'vuex'
 import { Base64 } from 'js-base64'
 import trendDataTypeMix from '@/mixins/trendDataType'
+import watermark from '@/common/utils/watermark'
 export default {
   mixins: [trendDataTypeMix],
   data () {
@@ -65,17 +65,21 @@ export default {
       setChartData: [],
       isNormalData: 1,
       trendChart: null,
-      chartOption: {},
-      dragPic: require('../../assets/img/icons/dragicon.png')
+      chartOption: {}
     }
   },
   computed: {
     ...mapGetters([
+      'getUserData',
       'getShopData',
       'getPkCheckData'
     ]),
     shopTitle () {
       const target = this.getShopData.filter(i => i.value === this.form.shop)[0]
+      return target ? target.label : ''
+    },
+    titlePromot () {
+      const target = this.dataTypeOptions.filter(i => i.value === this.dataType)[0]
       return target ? target.label : ''
     }
   },
@@ -87,6 +91,10 @@ export default {
   mounted () {
     this.setDataTypeOption()
     this.setPromotOption()
+    // 创建水印
+    this.$nextTick(() => {
+      watermark.set(`${this.getUserData.staffId}`, 80)
+    })
     // 窗口变化重置图表
     window.addEventListener('resize', this.resizeChart, false)
   },
@@ -94,7 +102,8 @@ export default {
     getChartData () {
       this.$request.post('/getList', this.form).then(res => {
         this.tableAllData = res.data || []
-        this.fetchData()
+        // this.fetchData()
+        this.initChart()
       })
     },
     setDataTypeOption () {
@@ -123,9 +132,6 @@ export default {
       // 选择了推广类型
       if (this.promotType.length > 0) {
         this.createChart()
-        // this.promotType.map(item => {
-        //   debugger
-        // })
       }
     },
     fetchData () {
@@ -149,7 +155,6 @@ export default {
         })
       })
       this.chartOption = this._setchartOptionData()
-      this.initChart()
     },
     formatDateTime (item) {
       const dateType = Object.keys(item).findIndex(i => {
@@ -159,10 +164,13 @@ export default {
       this.isNormalData = dateType >= 0 ? 1 : 0
     },
     initChart () {
-      this.trendChart = echarts.init(this.$refs.chart)
+      this.$nextTick(() => {
+        this.trendChart = echarts.init(this.$refs.chart)
+      })
       this.createChart()
     },
-    createChart () {
+    async createChart () {
+      await this.fetchData()
       this.trendChart.setOption({}, true)
       this.trendChart.setOption(this.chartOption)
     },

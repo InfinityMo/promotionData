@@ -29,6 +29,7 @@ import echarts from 'echarts'
 import { dealTrendData, setChartOption } from './trendSeting'
 import { Base64 } from 'js-base64'
 import { mapGetters } from 'vuex'
+import watermark from '@/common/utils/watermark'
 export default {
   data () {
     return {
@@ -48,6 +49,7 @@ export default {
   },
   computed: {
     ...mapGetters([
+      'getUserData',
       'getShopData'
     ])
   },
@@ -58,6 +60,10 @@ export default {
     this.getChartData()
   },
   mounted () {
+    // 创建水印
+    this.$nextTick(() => {
+      watermark.set(`${this.getUserData.staffId}`, 80)
+    })
     // 窗口变化重置图表
     window.addEventListener('resize', this.resizeChart, false)
   },
