@@ -384,6 +384,10 @@ export default {
         shop: this.searchForm.shop,
         dataType: dataTypeArr.join() || ''
       })
+      if (downForm.timeType === 7) {
+        downForm.startDate = monthSpliceDay(downForm.startDate)[0]
+        downForm.endDate = monthSpliceDay(downForm.endDate)[1]
+      }
       const src = `${process.env.VUE_APP_API}/export?timeType=${downForm.timeType}&startDate=${downForm.startDate}&endDate=${downForm.endDate}&shop=${downForm.shop}&dataType=${downForm.dataType}&trackId=${this.$store.state.trackId || ''}&permissionsCode=${this.$store.state.permissionsCode || ''}&user=${this.userData.staffId || ''}`
       location.href = src
     },
