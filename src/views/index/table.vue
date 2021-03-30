@@ -138,7 +138,7 @@
       </el-form>
       <span slot="footer"
             class="dialog-footer user-edit">
-        <el-button @click="pkDataShow = false">取 消</el-button>
+        <el-button @click="pkDataDialogClose">取 消</el-button>
         <el-button type="primary"
                    @click="pkDataHandle">确 定</el-button>
       </span>
@@ -186,7 +186,7 @@ export default {
       paginationKey: 1,
       currentEditIndex: null,
       pkDataShow: false,
-      pkDataFrom: Object.assign({}, pkDataFrom),
+      pkDataFrom: JSON.parse(JSON.stringify(pkDataFrom)),
       pkDataFromRules: pkDataFromRules,
       pkDataTypeArr: [],
       pkPromotArr: []
@@ -662,6 +662,9 @@ export default {
       })
     },
     pkDataDialogClose () {
+      this.pkDataShow = false
+      this.pkDataTypeArr = []
+      this.pkPromotArr = []
       this.$refs.pkDataFrom.resetFields()
     }
   }

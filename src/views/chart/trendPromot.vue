@@ -91,8 +91,13 @@ export default {
           label: i.dataType
         })
       })
-      // 默认选择前两项类型
-      this.dataType = [this.promotOptions[0].value, this.promotOptions[1].value]
+      if (this.promotOptions.length >= 2) {
+        // 默认选择前两项类型
+        this.dataType = [this.promotOptions[0].value, this.promotOptions[1].value]
+      } else {
+        this.dataType = [this.promotOptions[0].value]
+      }
+
       const returnObj = dealTrendData(this.filterData, this.dataType, this.nData)
       this.isPrecent = returnObj.isPrecent
       this.setTitle(returnObj.timeArr)
