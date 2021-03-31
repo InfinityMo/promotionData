@@ -26,7 +26,7 @@ export default {
       this.xAxisData = []
       this.tempFetchPromot.map((i, index) => {
         if (index === 0) {
-          Object.keys(i.obj.data[0]).forEach(k => {
+          Object.keys(i.obj.data[0]).sort().forEach(k => {
             if (this.gobalReg.test(k)) {
               if (this.isNormalData) {
                 if (k.length > 7) {

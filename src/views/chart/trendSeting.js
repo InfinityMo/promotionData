@@ -26,7 +26,7 @@ export const dealTrendData = (promotData, dataType, nData) => {
     listData(item)
     if (index === 0) {
       // 将数据的第0个作为当前x轴的坐标系
-      Object.keys(item).forEach(k => {
+      Object.keys(item).sort().map(k => {
         if (gobalReg.reg.test(k)) {
           if (Number(nData)) {
             if (k.length > 7) {
@@ -41,6 +41,7 @@ export const dealTrendData = (promotData, dataType, nData) => {
       })
     }
   })
+  // console.log(chartObj.timeArr)
   // 构建series
   createSeries(selectData)
   // -1为无右侧百分比坐标系，不等于1为有百分比坐标系
