@@ -2,7 +2,7 @@ import { setTousandNum } from '@/common/utils/funcStore'
 const gobalReg = {
   reg: ''
 }
-const colorDisk = ['#2D99FF', '#2CD8C5', '#FF6C40', '#FFE700', '#826AF9', '#78D3F8', '#9661BC', '#008685', '#F08BB4', '#65789B']
+const colorDisk = ['#2D99FF', '#2CD8C5', '#FF6C40', '#FFE700', '#826AF9', '#78D3F8', '#C356CC', '#008685', '#F08BB4', '#65789B']
 const chartObj = {
   legend: [],
   timeArr: [],
@@ -115,6 +115,9 @@ export const setChartOption = (isPrecent) => {
       data: chartObj.legend,
       top: '0',
       right: '10',
+      itemHeight: 20,
+      itemWidth: 32,
+      // borderWidth: 5,
       textStyle: {
         color: '#333',
         fontSize: 14
